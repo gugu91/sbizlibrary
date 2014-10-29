@@ -21,7 +21,7 @@ namespace Sbiz.Library
                 host = Dns.GetHostEntry(Dns.GetHostName());
                 foreach (IPAddress ip in host.AddressList)
                 {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork && ip.Equals(IPAddress.Loopback))
+                    if (ip.AddressFamily == AddressFamily.InterNetwork && !ip.Equals(IPAddress.Loopback))
                     {
                         myIP = ip.ToString();
                     }
