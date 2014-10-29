@@ -11,6 +11,7 @@ namespace Sbiz.Library
 {
     public static class SbizConf
     {
+        private enum SbizSocketConfLine { address, port}
         public static string MyIP
         {
             get
@@ -33,6 +34,14 @@ namespace Sbiz.Library
         private const string _sbizSocketFilename = "socketconf.txt";
         private const int _defaultPort = 15001;
         private const string _defaultAddress = "192.168.0.1";
+
+        private static IPAddress DefaultAddress
+        {
+            get
+            {
+                return IPAddress.Parse(_defaultAddress);
+            }
+        }
         private static string DirPath
         {
             get
@@ -46,15 +55,7 @@ namespace Sbiz.Library
         {
             get
             {
-                string path = DirPath + "\\" + _sbizSocketFilename;
-                if (!File.Exists(path))
-                {
-                    StreamWriter sw = new StreamWriter(path);
-                    sw.Write(_defaultPort);
-                    sw.Close();
-                }
-
-                return path;
+                return DirPath + "\\" + _sbizSocketFilename;
             }
         }
 
@@ -63,59 +64,84 @@ namespace Sbiz.Library
             get{
                 Int32 retValue;
 
-                StreamReader sr = new StreamReader(SbizSocketPath);
-
                 try{
-                    string port_ascii = sr.ReadLine();
-                    sr.Close();
+                    string port_ascii = ReadSocketConfFileAt(SbizSocketConfLine.port);
                     retValue = Int32.Parse(port_ascii);
-                } catch (Exception e){
-                    StreamWriter sw = new StreamWriter(SbizSocketPath);
-                    sw.Write(_defaultPort);
-                    sw.Close();
-                    retValue = _defaultPort;
+                } catch {
+                    UpdateSocketConfFile(_defaultPort, SbizSocketAddress);
+                    return _defaultPort;
                 }
 
                 return retValue;
             }
             set
             {
-                StreamWriter sw = new StreamWriter(SbizSocketPath);
-                sw.Write(value);
-                sw.Close();
+                UpdateSocketConfFile(value, SbizSocketAddress);
             }
         }
 
-        public static string SbizSocketAddress
+        public static IPAddress SbizSocketAddress
         {
             get
             {
-                string retValue;
-
-                StreamReader sr = new StreamReader(SbizSocketPath);
+                IPAddress address;
 
                 try
                 {
-                    retValue = sr.ReadLine();
-                    sr.Close();
+                    address = IPAddress.Parse(ReadSocketConfFileAt(SbizSocketConfLine.address));
                 }
-                catch (Exception e)
+                catch
                 {
-                    StreamWriter sw = new StreamWriter(SbizSocketPath);
-                    sw.Write(_defaultAddress);
-                    sw.Close();
-
-                    return _defaultAddress;
+                    UpdateSocketConfFile(_defaultPort, DefaultAddress);
+                    return DefaultAddress;
                 }
 
-                return retValue;
+                return address;
             }
             set
             {
-                StreamWriter sw = new StreamWriter(SbizSocketPath);
-                sw.Write(value);
-                sw.Close();
+                UpdateSocketConfFile(SbizSocketPort, value);
             }
+        }
+
+        private static void UpdateSocketConfFile(int new_port, IPAddress new_address){
+            StreamWriter sw = new StreamWriter(SbizSocketPath);
+
+            var lines = Enum.GetValues(typeof(SbizSocketConfLine)).Cast<SbizSocketConfLine>();
+            foreach (var line in lines)
+            {
+                if (line == SbizSocketConfLine.port) sw.WriteLine(new_port);
+                if (line == SbizSocketConfLine.address) sw.WriteLine(new_address.ToString());
+            }
+
+            sw.Close();
+        }
+        private static string ReadSocketConfFileAt(SbizSocketConfLine index){
+            string buffer;
+            StreamReader sr;
+
+            try
+            {
+               sr = new StreamReader(SbizSocketPath);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            var lines = Enum.GetValues(typeof(SbizSocketConfLine)).Cast<SbizSocketConfLine>();
+            foreach (var line in lines)
+            {
+                buffer = sr.ReadLine();
+                if (line == index)
+                {
+                    sr.Close();
+                    return buffer;
+                }
+            }
+
+            sr.Close();
+            return null;
         }
 
     }
