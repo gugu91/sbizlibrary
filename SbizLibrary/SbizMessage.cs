@@ -3,21 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 
 namespace SbizLibrary
 {
-    class SbizMessageConst
+    public class SbizMessageConst
     {
         public static int KEY_PRESS = 1;
         //vari tipi di messaggi da mandare
     }
 
     [Serializable]
-    class SbizMessage
+    public class SbizMessage
     {
+        #region Attributes
+
         private int _code;
+        private byte[] _data;
+
+        #endregion
+
+
+        #region Properties
         public int Code
         {
             get
@@ -25,8 +31,6 @@ namespace SbizLibrary
                 return _code;
             }
         }
-
-        private byte[] _data;
         public byte[] Data
         {
             get
@@ -34,41 +38,41 @@ namespace SbizLibrary
                 return _data;
             }
         }
+        #endregion
 
+
+        #region Constructors
         public SbizMessage(int code, byte[] data)
         {
             _code = code;
             _data = data;
         }
-
+        public SbizMessage(int code, EventArgs eargs)
+        {
+            _code = code;
+            _data = null;
+        }
         public SbizMessage(byte[] data)
         {
-            MemoryStream ms = new MemoryStream(data);
-            BinaryFormatter bf = new BinaryFormatter();
+            SbizMessage m = SbizBasic.DeserializeByteArray(data) as SbizMessage;
 
-            ms.Position = 0;
-
-            SbizMessage o = bf.Deserialize(ms) as SbizMessage;
-
-            if (o == null)
+            if (m == null)
             {
                 throw new ArgumentNullException();
             }
 
-            this._code = o.Code;
-            this._data = o.Data;
+            this._code = m.Code;
+            this._data = m.Data;
         }
+        #endregion
 
+
+        #region InstanceMethods
         public byte[] ToByteArray()
         {
-            if (this == null)
-                return null;
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, this);
-                return ms.ToArray();
-            }
+            return SbizBasic.SerializeObject(this);
         }
+        #endregion
+
     }
 }
