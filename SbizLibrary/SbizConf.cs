@@ -11,7 +11,6 @@ namespace Sbiz.Library
 {
     public static class SbizConf
     {
-        private enum SbizSocketConfLine { address, port}
         public static string MyIP
         {
             get
@@ -30,11 +29,48 @@ namespace Sbiz.Library
             }
         }
 
+        #region SocketTimeout
+        private const int _SbizSocketTimeout_ms = 100;
+
+        #region Properties
+
+        public static int SbizSocketTimeout_ms
+        {
+            get
+            {
+                return _SbizSocketTimeout_ms;
+            }
+        }
+
+        public static int SbizSocketTimeout_us
+        {
+            get
+            {
+                return SbizSocketTimeout_ms*10^3;
+            }
+        }
+
+        public static int SbizSocketTimeout_ns
+        {
+            get
+            {
+                return SbizSocketTimeout_us*10^3;
+            }
+        }
+        #endregion
+        #endregion
+
+        #region SocketConfFile
+        private enum SbizSocketConfLine { address, port }
+
+        #region Attributes
         private const string _dirPath = "conf";
         private const string _sbizSocketFilename = "socketconf.txt";
         private const int _defaultPort = 15001;
         private const string _defaultAddress = "192.168.0.1";
+        #endregion
 
+        #region Properties
         private static IPAddress DefaultAddress
         {
             get
@@ -50,7 +86,6 @@ namespace Sbiz.Library
                 return _dirPath;
             }
         }
-
         private static string SbizSocketPath
         {
             get
@@ -58,7 +93,6 @@ namespace Sbiz.Library
                 return DirPath + "\\" + _sbizSocketFilename;
             }
         }
-
         public static Int32 SbizSocketPort
         {
             get{
@@ -79,7 +113,6 @@ namespace Sbiz.Library
                 UpdateSocketConfFile(value, SbizSocketAddress);
             }
         }
-
         public static IPAddress SbizSocketAddress
         {
             get
@@ -103,7 +136,9 @@ namespace Sbiz.Library
                 UpdateSocketConfFile(SbizSocketPort, value);
             }
         }
+        #endregion
 
+        #region StaticMethods
         private static void UpdateSocketConfFile(int new_port, IPAddress new_address){
             StreamWriter sw = new StreamWriter(SbizSocketPath);
 
@@ -143,6 +178,7 @@ namespace Sbiz.Library
             sr.Close();
             return null;
         }
-
+        #endregion
+        #endregion
     }
 }
