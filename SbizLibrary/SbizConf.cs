@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
-namespace SbizServer
+namespace Sbiz.Library
 {
     public static class SbizConf
     {
@@ -32,6 +32,7 @@ namespace SbizServer
         private const string _dirPath = "conf";
         private const string _sbizSocketFilename = "socketconf.txt";
         private const int _defaultPort = 15001;
+        private const string _defaultAddress = "192.168.0.1";
         private static string DirPath
         {
             get
@@ -73,6 +74,38 @@ namespace SbizServer
                     sw.Write(_defaultPort);
                     sw.Close();
                     retValue = _defaultPort;
+                }
+
+                return retValue;
+            }
+            set
+            {
+                StreamWriter sw = new StreamWriter(SbizSocketPath);
+                sw.Write(value);
+                sw.Close();
+            }
+        }
+
+        public static string SbizSocketAddress
+        {
+            get
+            {
+                string retValue;
+
+                StreamReader sr = new StreamReader(SbizSocketPath);
+
+                try
+                {
+                    retValue = sr.ReadLine();
+                    sr.Close();
+                }
+                catch (Exception e)
+                {
+                    StreamWriter sw = new StreamWriter(SbizSocketPath);
+                    sw.Write(_defaultAddress);
+                    sw.Close();
+
+                    return _defaultAddress;
                 }
 
                 return retValue;
