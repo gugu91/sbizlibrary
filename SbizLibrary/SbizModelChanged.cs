@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace Sbiz.Library
 {
     #region Delegates
-    public delegate void ModelChanged_Delegate(object sender, SbizModelChanged_EventArgs args);
-    public delegate void UpdateViewDelegate(object sender, SbizModelChanged_EventArgs args);
+    public delegate void SbizModelChanged_Delegate(object sender, SbizModelChanged_EventArgs args);
+    public delegate void SbizUpdateView_Delegate(object sender, SbizModelChanged_EventArgs args);
     #endregion
 
     public class SbizModelChanged_EventArgs : EventArgs
