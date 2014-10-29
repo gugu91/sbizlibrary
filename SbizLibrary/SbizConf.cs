@@ -4,11 +4,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 
 namespace SbizServer
 {
     public static class SbizConf
     {
+        public static string MyIP
+        {
+            get
+            {
+                IPHostEntry host;
+                string myIP = "?";
+                host = Dns.GetHostEntry(Dns.GetHostName());
+                foreach (IPAddress ip in host.AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork && ip.Equals(IPAddress.Loopback))
+                    {
+                        myIP = ip.ToString();
+                    }
+                }
+                return myIP;
+            }
+        }
+
         private const string _dirPath = "conf";
         private const string _sbizSocketFilename = "socketconf.txt";
         private const int _defaultPort = 15001;
