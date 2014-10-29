@@ -31,9 +31,16 @@ namespace Sbiz.Library
 
         #region SocketTimeout
         private const int _SbizSocketTimeout_ms = 100;
+        private const int _SbizSocketPacketLossAcceptance = 5;
 
         #region Properties
-
+        public static int SbizSocketPacketLossAcceptance
+        {
+            get
+            {
+                return _SbizSocketPacketLossAcceptance;
+            }
+        }
         public static int SbizSocketTimeout_ms
         {
             get
