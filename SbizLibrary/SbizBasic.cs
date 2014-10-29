@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace Sbiz
+namespace Sbiz.Library
 {
     public static class SbizBasic
     {

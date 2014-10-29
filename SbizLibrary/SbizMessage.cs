@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sbiz.Library.Message
+namespace Sbiz.Library
 {
     public class SbizMessageConst
     {
