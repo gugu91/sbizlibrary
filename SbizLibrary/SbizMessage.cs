@@ -8,6 +8,7 @@ namespace Sbiz.Library
 {
     public class SbizMessageConst
     {
+        public static int KEEPALIVE = 0;
         public static int KEY_PRESS = 1;
         //vari tipi di messaggi da mandare
     }
@@ -41,16 +42,20 @@ namespace Sbiz.Library
         #endregion
 
 
+        #region StaticMethods
+        public static byte[] KeepAliveMessage(){
+            SbizMessage kam = new SbizMessage(SbizMessageConst.KEEPALIVE, Encoding.UTF8.GetBytes("alive"));
+
+            return kam.ToByteArray();
+        }
+        #endregion
+
+
         #region Constructors
         public SbizMessage(int code, byte[] data)
         {
             _code = code;
             _data = data;
-        }
-        public SbizMessage(int code, EventArgs eargs)
-        {
-            _code = code;
-            _data = null;
         }
         public SbizMessage(byte[] data)
         {
