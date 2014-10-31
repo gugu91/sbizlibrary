@@ -20,7 +20,7 @@ namespace Sbiz.Library
                 bf.Serialize(ms, o);
                 return ms.ToArray();
             }
-        }
+        }    
         public static Object DeserializeByteArray(byte[] array)
         {
             MemoryStream ms = new MemoryStream(array);
@@ -36,6 +36,8 @@ namespace Sbiz.Library
             }
             catch (Exception e)
             {
+                //TODO non propagare l'eccezione ma scrivere sul log formato dati non corretto
+                
                 throw e;
             }
 

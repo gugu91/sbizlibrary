@@ -59,7 +59,7 @@ namespace Sbiz.Library
         }
         public SbizMessage(byte[] data)
         {
-            SbizMessage m = SbizBasic.DeserializeByteArray(data) as SbizMessage;
+            SbizMessage m = SbizBasic.DeserializeByteArray(data) as SbizMessage;           
 
             if (m == null)
             {
