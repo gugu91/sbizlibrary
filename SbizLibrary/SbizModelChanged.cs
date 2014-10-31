@@ -18,6 +18,7 @@ namespace Sbiz.Library
 
         public const int CONNECTED = 1;
         public const int NOT_CONNECTED = 0;
+        public const int NOT_LISTENING = -2;
         public const int ERROR = -1;
 
         public int Status
