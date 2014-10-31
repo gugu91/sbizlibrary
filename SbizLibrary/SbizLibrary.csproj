@@ -7,7 +7,7 @@
     <ProjectGuid>{286E257D-C97F-42BB-BF31-D6E5E5ACF7C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SbizLibrary</RootNamespace>
+    <RootNamespace>Sbiz.Library</RootNamespace>
     <AssemblyName>SbizLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -46,6 +46,7 @@
     <Compile Include="SbizBasic.cs" />
     <Compile Include="SbizMessage.cs" />
     <Compile Include="SbizConf.cs" />
+    <Compile Include="SbizQueue.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

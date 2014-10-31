@@ -44,6 +44,7 @@ namespace Sbiz.Library
 
         #endregion
 
+        #region StaticMethods
         private static void UpdateLogFile(string line)
         {
             StreamWriter sw = new StreamWriter(SbizLoggerPath, true);
@@ -55,6 +56,6 @@ namespace Sbiz.Library
             sw.WriteLine(log_line);
             sw.Close();
         }
-        
+        #endregion
     }
 }
