@@ -8,7 +8,7 @@ namespace Sbiz.Library
 {
     public class SbizMessageConst
     {
-        public static int KEEPALIVE = 0;
+        public static int ANNOUNCE = 0;
         public static int KEY_PRESS = 1;
         //vari tipi di messaggi da mandare
     }
@@ -43,8 +43,8 @@ namespace Sbiz.Library
 
 
         #region StaticMethods
-        public static byte[] KeepAliveMessage(){
-            SbizMessage kam = new SbizMessage(SbizMessageConst.KEEPALIVE, Encoding.UTF8.GetBytes("alive"));
+        public static byte[] AnnounceMessage(int TCPport){
+            SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, Encoding.UTF8.GetBytes(TCPport.ToString()));
 
             return kam.ToByteArray();
         }
