@@ -15,8 +15,8 @@ namespace Sbiz.Library
         private MouseButtons _button;
         private int _clicks;
         private int _delta;
-        private int _rel_x;
-        private int _rel_y;
+        private float _rel_x;
+        private float _rel_y;
         #endregion
 
         #region Properties
@@ -45,36 +45,34 @@ namespace Sbiz.Library
         {
             get
             {
-                int x = _rel_x * Screen.PrimaryScreen.Bounds.Width;
-                int y = _rel_y * Screen.PrimaryScreen.Bounds.Height;
-                return new System.Drawing.Point(x, y);
+                return new System.Drawing.Point(X, Y);
             }
         }
-        public int RelX
+        public int X
         {
             get
             {
-                return _rel_x;
+                return (int)Math.Round(_rel_x * Screen.PrimaryScreen.Bounds.Width);
             }
         }
-        public int RelY
+        public int Y
         {
             get
             {
-                return _rel_y;
+                return (int)Math.Round(_rel_y * Screen.PrimaryScreen.Bounds.Height);
             }
         }
 
         #endregion
 
         #region Constructors
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int rel_x, int rel_y)
+        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int x, int y)
         {
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            _rel_x = rel_x;
-            _rel_y = rel_y;
+            _rel_x = x / Screen.PrimaryScreen.Bounds.Width;
+            _rel_y = y / Screen.PrimaryScreen.Bounds.Height;
         }
 
         public SbizMouseEventArgs(byte[] data)
@@ -85,11 +83,11 @@ namespace Sbiz.Library
             {
                 throw new ArgumentNullException();
             }
-            _button = m.Button;
-            _clicks = m.Clicks;
-            _delta = m.Delta;
-            _rel_x = m.RelX;
-            _rel_y = m.RelY;
+            _button = m._button;
+            _clicks = m._clicks;
+            _delta = m._delta;
+            _rel_x = m._rel_x;
+            _rel_y = m._rel_y;
             
         }
         #endregion
