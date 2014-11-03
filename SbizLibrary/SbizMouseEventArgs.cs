@@ -71,7 +71,6 @@ namespace Sbiz.Library
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            _location = location;
             _x = x;
             _y = y;
         }
