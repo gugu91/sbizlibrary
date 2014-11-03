@@ -17,6 +17,7 @@ namespace Sbiz.Library
         private string _error_message;
 
         public const int CONNECTED = 1;
+        public const int TRYING = 2;
         public const int NOT_CONNECTED = 0;
         public const int NOT_LISTENING = -2;
         public const int ERROR = -1;
