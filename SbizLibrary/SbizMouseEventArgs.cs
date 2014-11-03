@@ -9,7 +9,7 @@ using System.Windows.Forms;
 namespace Sbiz.Library
 {
     [Serializable]
-    class SbizMouseEventArgs
+    public class SbizMouseEventArgs
     {
         #region Attributes
         private MouseButtons _button;
