@@ -15,8 +15,8 @@ namespace Sbiz.Library
         private MouseButtons _button;
         private int _clicks;
         private int _delta;
-        private int _x;
-        private int _y;
+        private int _rel_x;
+        private int _rel_y;
         #endregion
 
         #region Properties
@@ -45,35 +45,52 @@ namespace Sbiz.Library
         {
             get
             {
-                return new System.Drawing.Point(_x, _y);
+                int x = _rel_x * Screen.PrimaryScreen.Bounds.Width;
+                int y = _rel_y * Screen.PrimaryScreen.Bounds.Height;
+                return new System.Drawing.Point(x, y);
             }
         }
-        public int X
+        public int RelX
         {
             get
             {
-                return _x;
+                return _rel_x;
             }
         }
-        public int Y
+        public int RelY
         {
             get
             {
-                return _y;
+                return _rel_y;
             }
         }
 
         #endregion
 
         #region Constructors
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int x, int y)
+        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int rel_x, int rel_y)
         {
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            _location = location;
-            _x = x;
-            _y = y;
+            _rel_x = rel_x;
+            _rel_y = rel_y;
+        }
+
+        public SbizMouseEventArgs(byte[] data)
+        {
+            SbizMouseEventArgs m = SbizBasic.DeserializeByteArray(data) as SbizMouseEventArgs;           
+
+            if (m == null)
+            {
+                throw new ArgumentNullException();
+            }
+            _button = m.Button;
+            _clicks = m.Clicks;
+            _delta = m.Delta;
+            _rel_x = m.RelX;
+            _rel_y = m.RelY;
+            
         }
         #endregion
 
