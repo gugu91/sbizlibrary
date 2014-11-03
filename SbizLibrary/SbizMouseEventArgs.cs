@@ -45,6 +45,7 @@ namespace Sbiz.Library
         {
             get
             {
+                SbizLogger.Logger = X + ", " + Y;
                 return new System.Drawing.Point(X, Y);
             }
         }
@@ -79,6 +80,7 @@ namespace Sbiz.Library
             _button = button;
             _clicks = clicks;
             _delta = delta;
+            SbizLogger.Logger = screen_point.X + ", " + screen_point.Y;
             _rel_x = screen_point.X / Screen.PrimaryScreen.Bounds.Width;
             _rel_y = screen_point.Y / Screen.PrimaryScreen.Bounds.Height;
         }
