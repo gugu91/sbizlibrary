@@ -15,7 +15,6 @@ namespace Sbiz.Library
         private MouseButtons _button;
         private int _clicks;
         private int _delta;
-        private System.Drawing.Point _location;
         private int _x;
         private int _y;
         #endregion
@@ -46,7 +45,7 @@ namespace Sbiz.Library
         {
             get
             {
-                return _location;
+                return new System.Drawing.Point(_x, _y);
             }
         }
         public int X
@@ -67,7 +66,7 @@ namespace Sbiz.Library
         #endregion
 
         #region Constructors
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, System.Drawing.Point location, int x, int y)
+        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int x, int y)
         {
             _button = button;
             _clicks = clicks;
