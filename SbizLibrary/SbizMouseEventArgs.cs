@@ -79,8 +79,8 @@ namespace Sbiz.Library
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            _rel_x = screen_point.X;
-            _rel_y = screen_point.Y;
+            _rel_x = screen_point.X / Screen.PrimaryScreen.Bounds.Width;
+            _rel_y = screen_point.Y / Screen.PrimaryScreen.Bounds.Height;
         }
         /// <summary>
         /// Creates a new istance of class SbizMouseEventArgs. Pay attention tha x and y coordinates need to be in screen coordinates
