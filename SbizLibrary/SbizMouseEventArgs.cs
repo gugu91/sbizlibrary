@@ -15,7 +15,7 @@ namespace Sbiz.Library
         private MouseButtons _button;
         private int _clicks;
         private int _delta;
-        private float _rel_x;
+        private float _rel_x;//contents are stored relatively for interoperability but the external interface is unaware of this 
         private float _rel_y;
         #endregion
 
@@ -66,13 +66,37 @@ namespace Sbiz.Library
         #endregion
 
         #region Constructors
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int x, int y)
+        /// <summary>
+        /// Creates a new istance of class SbizMouseEventArgs. Pay attention tha x and y coordinates of screen_point
+        /// need to be in screen coordinates
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="clicks"></param>
+        /// <param name="delta"></param>
+        /// <param name="screen_point">point in screen coordinates</param>
+        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, System.Drawing.Point screen_point)
         {
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            _rel_x = x / Screen.PrimaryScreen.Bounds.Width;
-            _rel_y = y / Screen.PrimaryScreen.Bounds.Height;
+            _rel_x = screen_point.X;
+            _rel_y = screen_point.Y;
+        }
+        /// <summary>
+        /// Creates a new istance of class SbizMouseEventArgs. Pay attention tha x and y coordinates need to be in screen coordinates
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="clicks"></param>
+        /// <param name="delta"></param>
+        /// <param name="screen_x">x position in screen coordinates</param>
+        /// <param name="screen_y">y position in screen coordinates</param>
+        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int screen_x, int screen_y)
+        {
+            _button = button;
+            _clicks = clicks;
+            _delta = delta;
+            _rel_x = screen_x / Screen.PrimaryScreen.Bounds.Width;
+            _rel_y = screen_y / Screen.PrimaryScreen.Bounds.Height;
         }
 
         public SbizMouseEventArgs(byte[] data)
