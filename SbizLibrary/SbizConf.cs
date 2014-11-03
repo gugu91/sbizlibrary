@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-
+using System.Security.AccessControl;
 namespace Sbiz.Library
 {
     public static class SbizConf
@@ -89,7 +89,11 @@ namespace Sbiz.Library
         {
             get
             {
-                if (!Directory.Exists(_dirPath)) Directory.CreateDirectory(_dirPath);
+                if (!Directory.Exists(_dirPath))
+                {
+                    Directory.CreateDirectory(_dirPath);
+                    AddDirectorySecurity(_dirPath, Environment.UserName, FileSystemRights.FullControl, AccessControlType.Allow);
+                }
                 return _dirPath;
             }
         }
@@ -185,6 +189,27 @@ namespace Sbiz.Library
             sr.Close();
             return null;
         }
+
+        // Adds an ACL entry on the specified directory for the specified account. 
+        private static void AddDirectorySecurity(string FileName, string Account, FileSystemRights Rights, AccessControlType ControlType)
+        {
+            // Create a new DirectoryInfo object.
+            DirectoryInfo dInfo = new DirectoryInfo(FileName);
+
+            // Get a DirectorySecurity object that represents the  
+            // current security settings.
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+
+            // Add the FileSystemAccessRule to the security settings. 
+            dSecurity.AddAccessRule(new FileSystemAccessRule(Account,
+                                                            Rights,
+                                                            ControlType));
+
+            // Set the new access settings.
+            dInfo.SetAccessControl(dSecurity);
+
+        }
+
         #endregion
         #endregion
     }
