@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 namespace Sbiz.Library
 {
-    public class SbizMessageConst
+    public static class SbizMessageConst
     {
-        public static int ANNOUNCE = 0;
-        public static int KEY_PRESS = 1;
-        //vari tipi di messaggi da mandare
+        public const int ANNOUNCE = 0;
+        public const int KEY_PRESS = 1;
+        //Other Key events...
+        public const int MOUSE_ENTER = 20;
+        public const int MOUSE_MOVE = 21;
+        public const int MOUSE_HOVER = 22;
+        public const int MOUSE_DOWN = 23;
+        public const int MOUSE_WHEEL = 24;
+        public const int MOUSE_UP = 25;
+        public const int MOUSE_LEAVE = 26;
+        //CLipboard Events...
     }
 
     [Serializable]
