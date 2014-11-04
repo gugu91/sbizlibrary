@@ -39,8 +39,12 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsInput">
+      <HintPath>InputSimulator\WindowsInput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SbizInputSimulator.cs" />
     <Compile Include="SbizLogger.cs" />
     <Compile Include="SbizModelChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
