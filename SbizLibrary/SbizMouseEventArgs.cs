@@ -49,6 +49,9 @@ namespace Sbiz.Library
                 return new System.Drawing.Point(X, Y);
             }
         }
+        /// <summary>
+        /// Readonly, X is in screen coordinates
+        /// </summary>
         public int X
         {
             get
@@ -56,6 +59,9 @@ namespace Sbiz.Library
                 return (int)Math.Round(_rel_x * (float)Screen.PrimaryScreen.Bounds.Width);
             }
         }
+        /// <summary>
+        /// Readonly, Y is in screen coordinates
+        /// </summary>
         public int Y
         {
             get
@@ -67,44 +73,18 @@ namespace Sbiz.Library
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Creates a new istance of class SbizMouseEventArgs. Pay attention tha x and y coordinates of screen_point
-        /// need to be in screen coordinates
-        /// </summary>
-        /// <param name="button"></param>
-        /// <param name="clicks"></param>
-        /// <param name="delta"></param>
-        /// <param name="screen_point">point in screen coordinates</param>
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, System.Drawing.Point screen_point)
+        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int x, int y, int x_bound, int y_bound)
         {
-            BaseConstructor(button, clicks, delta, screen_point.X, screen_point.Y);
+            BaseConstructor(button, clicks, delta, x, y, x_bound, y_bound);
         }
-        /// <summary>
-        /// Creates a new istance of class SbizMouseEventArgs. Pay attention tha x and y coordinates need to be in screen coordinates
-        /// </summary>
-        /// <param name="button"></param>
-        /// <param name="clicks"></param>
-        /// <param name="delta"></param>
-        /// <param name="screen_x">x position in screen coordinates</param>
-        /// <param name="screen_y">y position in screen coordinates</param>
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int screen_x, int screen_y)
-        {
-            /*_button = button;
-            _clicks = clicks;
-            _delta = delta;
-            _rel_x = ((float)screen_x) / ((float)Screen.PrimaryScreen.Bounds.Width);
-            _rel_y = ((float)screen_y) / ((float)Screen.PrimaryScreen.Bounds.Height);
-             * */
-            BaseConstructor(button, clicks, delta, screen_x, screen_y);
-        }
-        public void BaseConstructor(MouseButtons button, int clicks, int delta, int screen_x, int screen_y)
+        public void BaseConstructor(MouseButtons button, int clicks, int delta, int x, int y, int x_bound, int y_bound)
         {
             _button = button;
             _clicks = clicks;
             _delta = delta;
             //SbizLogger.Logger = screen_x + ", " + screen_y;
-            _rel_x = ((float)screen_x) / ((float)Screen.PrimaryScreen.Bounds.Width);
-            _rel_y = ((float)screen_y) / ((float)Screen.PrimaryScreen.Bounds.Height);
+            _rel_x = ((float)x) / ((float)x_bound);
+            _rel_y = ((float)y) / ((float)y_bound/*ex. Screen.PrimaryScreen.Bounds.Height*/);
         }
 
         public SbizMouseEventArgs(byte[] data)
