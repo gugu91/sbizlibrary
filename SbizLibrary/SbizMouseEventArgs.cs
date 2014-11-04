@@ -102,7 +102,7 @@ namespace Sbiz.Library
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            SbizLogger.Logger = screen_x + ", " + screen_y;
+            //SbizLogger.Logger = screen_x + ", " + screen_y;
             _rel_x = ((float)screen_x) / ((float)Screen.PrimaryScreen.Bounds.Width);
             _rel_y = ((float)screen_y) / ((float)Screen.PrimaryScreen.Bounds.Height);
         }
