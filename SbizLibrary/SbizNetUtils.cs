@@ -62,8 +62,8 @@ namespace Sbiz.Library
             seek += n_tobytearray.Length;
             Int32 n = System.Net.IPAddress.NetworkToHostOrder(BitConverter.ToInt32(n_tobytearray, 0));
 
-            byte[] buffer = new byte[n];
-            Array.Copy(data, seek, buffer, 0, n);
+            byte[] buffer = new byte[data.Length - n_tobytearray.Length];
+            Array.Copy(data, seek, buffer, 0, data.Length - n_tobytearray.Length);
 
             data = buffer;
 
