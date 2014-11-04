@@ -67,15 +67,14 @@ namespace Sbiz.Library
         }
         public SbizMessage(byte[] data)
         {
-            SbizMessage m = SbizNetUtils.DeserializeByteArray(data) as SbizMessage;           
-
-            if (m == null)
+            if (data == null)
             {
                 throw new ArgumentNullException();
             }
+            int code = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
 
-            this._code = m.Code;
-            this._data = m.Data;
+            this._code = code;
+            this._data = data;
         }
         #endregion
 
@@ -83,7 +82,7 @@ namespace Sbiz.Library
         #region InstanceMethods
         public byte[] ToByteArray()
         {
-            return SbizNetUtils.SerializeObject(this);
+            return SbizNetUtils.EncapsulateInt32inByteArray(_data, _code);
         }
         #endregion
 
