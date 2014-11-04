@@ -77,12 +77,7 @@ namespace Sbiz.Library
         /// <param name="screen_point">point in screen coordinates</param>
         public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, System.Drawing.Point screen_point)
         {
-            _button = button;
-            _clicks = clicks;
-            _delta = delta;
-            SbizLogger.Logger = screen_point.X + ", " + screen_point.Y;
-            _rel_x = screen_point.X / Screen.PrimaryScreen.Bounds.Width;
-            _rel_y = screen_point.Y / Screen.PrimaryScreen.Bounds.Height;
+            BaseConstructor(button, clicks, delta, screen_point.X, screen_point.Y);
         }
         /// <summary>
         /// Creates a new istance of class SbizMouseEventArgs. Pay attention tha x and y coordinates need to be in screen coordinates
@@ -94,11 +89,23 @@ namespace Sbiz.Library
         /// <param name="screen_y">y position in screen coordinates</param>
         public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int screen_x, int screen_y)
         {
+            /*_button = button;
+            _clicks = clicks;
+            _delta = delta;
+            _rel_x = ((float)screen_x) / ((float)Screen.PrimaryScreen.Bounds.Width);
+            _rel_y = ((float)screen_y) / ((float)Screen.PrimaryScreen.Bounds.Height);
+             * */
+            BaseConstructor(button, clicks, delta, screen_x, screen_y);
+        }
+        public void BaseConstructor(MouseButtons button, int clicks, int delta, int screen_x, int screen_y)
+        {
             _button = button;
             _clicks = clicks;
             _delta = delta;
-            _rel_x = screen_x / Screen.PrimaryScreen.Bounds.Width;
-            _rel_y = screen_y / Screen.PrimaryScreen.Bounds.Height;
+            SbizLogger.Logger = screen_x + ", " + screen_y;
+            _rel_x = ((float)screen_x) / ((float)Screen.PrimaryScreen.Bounds.Width);
+            SbizLogger.Logger = "Relx = " + _rel_x;
+            _rel_y = ((float)screen_y) / ((float)Screen.PrimaryScreen.Bounds.Height);
         }
 
         public SbizMouseEventArgs(byte[] data)
