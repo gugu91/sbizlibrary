@@ -53,14 +53,14 @@ namespace Sbiz.Library
         {
             get
             {
-                return (int)Math.Round(_rel_x * Screen.PrimaryScreen.Bounds.Width);
+                return (int)Math.Round(_rel_x * (float)Screen.PrimaryScreen.Bounds.Width);
             }
         }
         public int Y
         {
             get
             {
-                return (int)Math.Round(_rel_y * Screen.PrimaryScreen.Bounds.Height);
+                return (int)Math.Round(_rel_y * (float)Screen.PrimaryScreen.Bounds.Height);
             }
         }
 
@@ -104,7 +104,6 @@ namespace Sbiz.Library
             _delta = delta;
             SbizLogger.Logger = screen_x + ", " + screen_y;
             _rel_x = ((float)screen_x) / ((float)Screen.PrimaryScreen.Bounds.Width);
-            SbizLogger.Logger = "Relx = " + _rel_x;
             _rel_y = ((float)screen_y) / ((float)Screen.PrimaryScreen.Bounds.Height);
         }
 
