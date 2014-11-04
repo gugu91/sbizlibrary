@@ -8,16 +8,16 @@ namespace Sbiz.Library
 {
     public static class SbizMessageConst
     {
-        public const int ANNOUNCE = 0;
-        public const int KEY_PRESS = 1;
+        public const Int32 ANNOUNCE = 0;
+        public const Int32 KEY_PRESS = 1;
         //Other Key events...
-        public const int MOUSE_ENTER = 20;
-        public const int MOUSE_MOVE = 21;
-        public const int MOUSE_HOVER = 22;
-        public const int MOUSE_DOWN = 23;
-        public const int MOUSE_WHEEL = 24;
-        public const int MOUSE_UP = 25;
-        public const int MOUSE_LEAVE = 26;
+        public const Int32 MOUSE_ENTER = 20;
+        public const Int32 MOUSE_MOVE = 21;
+        public const Int32 MOUSE_HOVER = 22;
+        public const Int32 MOUSE_DOWN = 23;
+        public const Int32 MOUSE_WHEEL = 24;
+        public const Int32 MOUSE_UP = 25;
+        public const Int32 MOUSE_LEAVE = 26;
         //CLipboard Events...
     }
 
@@ -26,14 +26,14 @@ namespace Sbiz.Library
     {
         #region Attributes
 
-        private int _code;
+        private Int32 _code;
         private byte[] _data;
 
         #endregion
 
 
         #region Properties
-        public int Code
+        public Int32 Code
         {
             get
             {
@@ -51,7 +51,7 @@ namespace Sbiz.Library
 
 
         #region StaticMethods
-        public static byte[] AnnounceMessage(int TCPport){
+        public static byte[] AnnounceMessage(Int32 TCPport){
             SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, Encoding.UTF8.GetBytes(TCPport.ToString()));
 
             return kam.ToByteArray();
@@ -60,22 +60,21 @@ namespace Sbiz.Library
 
 
         #region Constructors
-        public SbizMessage(int code, byte[] data)
+        public SbizMessage(Int32 code, byte[] data)
         {
             _code = code;
             _data = data;
         }
         public SbizMessage(byte[] data)
         {
-            SbizMessage m = SbizBasic.DeserializeByteArray(data) as SbizMessage;           
-
-            if (m == null)
+            if (data == null)
             {
                 throw new ArgumentNullException();
             }
+            int code = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
 
-            this._code = m.Code;
-            this._data = m.Data;
+            this._code = code;
+            this._data = data;
         }
         #endregion
 
@@ -83,7 +82,7 @@ namespace Sbiz.Library
         #region InstanceMethods
         public byte[] ToByteArray()
         {
-            return SbizBasic.SerializeObject(this);
+            return SbizNetUtils.EncapsulateInt32inByteArray(_data, _code);
         }
         #endregion
 
