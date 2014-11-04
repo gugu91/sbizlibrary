@@ -45,7 +45,7 @@ namespace Sbiz.Library
         {
             get
             {
-                SbizLogger.Logger = X + ", " + Y;
+                //SbizLogger.Logger = X + ", " + Y;
                 return new System.Drawing.Point(X, Y);
             }
         }
@@ -109,7 +109,7 @@ namespace Sbiz.Library
 
         public SbizMouseEventArgs(byte[] data)
         {
-            SbizMouseEventArgs m = SbizBasic.DeserializeByteArray(data) as SbizMouseEventArgs;           
+            SbizMouseEventArgs m = SbizNetUtils.DeserializeByteArray(data) as SbizMouseEventArgs;           
 
             if (m == null)
             {
@@ -127,7 +127,7 @@ namespace Sbiz.Library
         #region InstanceMethods
         public byte[] ToByteArray()
         {
-            return SbizBasic.SerializeObject(this);
+            return SbizNetUtils.SerializeObject(this);
         }
         #endregion
     }
