@@ -69,5 +69,31 @@ namespace Sbiz.Library
 
             return n;
         }
+
+        public static byte[] EncapsulateInt64inByteArray(byte[] data, Int64 n)
+        {
+            byte[] n_tobytearray = BitConverter.GetBytes(System.Net.IPAddress.HostToNetworkOrder(n));//size of the message is sent
+            byte[] buffer = new byte[n_tobytearray.Length + data.Length];
+            n_tobytearray.CopyTo(buffer, 0);
+            data.CopyTo(buffer, n_tobytearray.Length);
+
+            return buffer;
+        }
+
+        public static Int64 DecapsulateInt64FromByteArray(ref byte[] data)
+        {
+            int seek = 0;
+            byte[] n_tobytearray = new byte[sizeof(Int64)];
+            Array.Copy(data, seek, n_tobytearray, 0, n_tobytearray.Length);
+            seek += n_tobytearray.Length;
+            Int64 n = System.Net.IPAddress.NetworkToHostOrder(BitConverter.ToInt64(n_tobytearray, 0));
+
+            byte[] buffer = new byte[data.Length - n_tobytearray.Length];
+            Array.Copy(data, seek, buffer, 0, data.Length - n_tobytearray.Length);
+
+            data = buffer;
+
+            return n;
+        }
     }
 }

@@ -13,10 +13,10 @@ namespace Sbiz.Library
     {
         #region Attributes
         private MouseButtons _button;
-        private int _clicks;
-        private int _delta;
-        private float _rel_x;//contents are stored relatively for interoperability but the external interface is unaware of this 
-        private float _rel_y;
+        private Int32 _clicks;
+        private Int32 _delta;
+        private double _rel_x;//contents are stored relatively for interoperability but the external interface is unaware of this 
+        private double _rel_y;
         #endregion
 
         #region Properties
@@ -27,14 +27,14 @@ namespace Sbiz.Library
                 return _button;
             }
         }
-        public int Clicks
+        public Int32 Clicks
         {
             get
             {
                 return _clicks;
             }
         }
-        public int Delta
+        public Int32 Delta
         {
             get
             {
@@ -52,11 +52,11 @@ namespace Sbiz.Library
         /// <summary>
         /// Readonly, X is in screen coordinates
         /// </summary>
-        public int X
+        public Int32 X
         {
             get
             {
-                return (int)Math.Round(_rel_x * (float)Screen.PrimaryScreen.Bounds.Width);
+                return (int)Math.Round(_rel_x * (double)Screen.PrimaryScreen.Bounds.Width);
             }
         }
         /// <summary>
@@ -66,27 +66,27 @@ namespace Sbiz.Library
         {
             get
             {
-                return (int)Math.Round(_rel_y * (float)Screen.PrimaryScreen.Bounds.Height);
+                return (Int32)Math.Round(_rel_y * (double)Screen.PrimaryScreen.Bounds.Height);
             }
         }
 
         #endregion
 
         #region Constructors
-        public SbizMouseEventArgs(MouseButtons button, int clicks, int delta, int x, int y, int x_bound, int y_bound)
+        public SbizMouseEventArgs(MouseButtons button, Int32 clicks, Int32 delta, Int32 x, Int32 y, Int32 x_bound, Int32 y_bound)
         {
             BaseConstructor(button, clicks, delta, x, y, x_bound, y_bound);
         }
-        public void BaseConstructor(MouseButtons button, int clicks, int delta, int x, int y, int x_bound, int y_bound)
+        public void BaseConstructor(MouseButtons button, Int32 clicks, Int32 delta, Int32 x, Int32 y, Int32 x_bound, Int32 y_bound)
         {
             _button = button;
             _clicks = clicks;
             _delta = delta;
             //SbizLogger.Logger = screen_x + ", " + screen_y;
-            _rel_x = ((float)x) / ((float)x_bound);
-            _rel_y = ((float)y) / ((float)y_bound/*ex. Screen.PrimaryScreen.Bounds.Height*/);
+            _rel_x = ((double)x) / ((double)x_bound);
+            _rel_y = ((double)y) / ((double)y_bound/*ex. Screen.PrimaryScreen.Bounds.Height*/);
         }
-
+        /*
         public SbizMouseEventArgs(byte[] data)
         {
             SbizMouseEventArgs m = SbizNetUtils.DeserializeByteArray(data) as SbizMouseEventArgs;           
@@ -101,13 +101,33 @@ namespace Sbiz.Library
             _rel_x = m._rel_x;
             _rel_y = m._rel_y;
             
+        }*/
+        public SbizMouseEventArgs(byte[] data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException();
+            }
+            _button = (MouseButtons)SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
+            _clicks = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
+            _delta = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
+            _rel_x = BitConverter.Int64BitsToDouble(SbizNetUtils.DecapsulateInt64FromByteArray(ref data));
+            _rel_y = BitConverter.Int64BitsToDouble(SbizNetUtils.DecapsulateInt64FromByteArray(ref data));
+
         }
         #endregion
 
         #region InstanceMethods
         public byte[] ToByteArray()
         {
-            return SbizNetUtils.SerializeObject(this);
+            byte[] buffer = BitConverter.GetBytes(System.Net.IPAddress.HostToNetworkOrder((Int32)Button));
+            buffer = SbizNetUtils.EncapsulateInt32inByteArray(buffer, _clicks);
+            buffer = SbizNetUtils.EncapsulateInt32inByteArray(buffer, _delta);
+            buffer = SbizNetUtils.EncapsulateInt64inByteArray(buffer, BitConverter.DoubleToInt64Bits(_rel_x));
+            buffer = SbizNetUtils.EncapsulateInt64inByteArray(buffer, BitConverter.DoubleToInt64Bits(_rel_y));
+
+            return buffer;
+            //return SbizNetUtils.SerializeObject(this);
         }
         #endregion
     }
