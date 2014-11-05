@@ -108,12 +108,11 @@ namespace Sbiz.Library
             {
                 throw new ArgumentNullException();
             }
-            _button = (MouseButtons)SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
-            _clicks = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
-            _delta = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
-            _rel_x = BitConverter.Int64BitsToDouble(SbizNetUtils.DecapsulateInt64FromByteArray(ref data));
             _rel_y = BitConverter.Int64BitsToDouble(SbizNetUtils.DecapsulateInt64FromByteArray(ref data));
-            SbizLogger.Logger = _button.ToString() + " " + _clicks.ToString() + " " + _delta.ToString() + " " + _rel_x.ToString() + " " + _rel_y.ToString();
+            _rel_x = BitConverter.Int64BitsToDouble(SbizNetUtils.DecapsulateInt64FromByteArray(ref data));
+            _delta = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
+            _clicks = SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
+            _button = (MouseButtons)SbizNetUtils.DecapsulateInt32FromByteArray(ref data);
         }
         #endregion
 
@@ -125,10 +124,8 @@ namespace Sbiz.Library
             buffer = SbizNetUtils.EncapsulateInt32inByteArray(buffer, _delta);
             buffer = SbizNetUtils.EncapsulateInt64inByteArray(buffer, BitConverter.DoubleToInt64Bits(_rel_x));
             buffer = SbizNetUtils.EncapsulateInt64inByteArray(buffer, BitConverter.DoubleToInt64Bits(_rel_y));
-            SbizLogger.Logger = _button.ToString() + " " + _clicks.ToString() + " " + _delta.ToString() + " " + _rel_x.ToString() + " " + _rel_y.ToString();
 
             return buffer;
-            //return SbizNetUtils.SerializeObject(this);
         }
         #endregion
     }
