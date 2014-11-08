@@ -29,6 +29,15 @@ namespace Sbiz.Library
             }
         }
 
+        public static string MyName
+        {
+            get
+            {
+                return MyIP;//TODO IMPLEMENT NAME FEATURE
+            }
+            
+        }
+
         #region SocketTimeout
         private const int _SbizSocketTimeout_ms = 100;
         private const int _SbizSocketPacketLossAcceptance = 5;

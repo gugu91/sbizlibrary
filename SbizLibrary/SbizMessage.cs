@@ -65,8 +65,9 @@ namespace Sbiz.Library
         public static byte[] NewToByteArray(String name, Int32 TCPport)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(name);
-            SbizNetUtils.EncapsulateInt32inByteArray(buffer, TCPport);
+            buffer = SbizNetUtils.EncapsulateInt32inByteArray(buffer, TCPport);
             SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, buffer);
+            
 
             return kam.ToByteArray();
         }
