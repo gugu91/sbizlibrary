@@ -52,7 +52,9 @@ namespace Sbiz.Library
 
         #region StaticMethods
         public static byte[] AnnounceMessage(Int32 TCPport){
-            SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, Encoding.UTF8.GetBytes(TCPport.ToString()));
+            byte[] buffer = new byte[0];
+            SbizNetUtils.EncapsulateInt32inByteArray(buffer, TCPport);
+            SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, buffer);
 
             return kam.ToByteArray();
         }
