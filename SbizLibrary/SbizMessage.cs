@@ -23,6 +23,56 @@ namespace Sbiz.Library
         //CLipboard Events...
     }
 
+    public class SbizAnnounce
+    {
+        #region Attributes
+        private Int32 _tcp_port;
+        private string _name;
+        #endregion
+
+        #region Properties
+        public Int32 TCPPort
+        {
+            get
+            {
+                return _tcp_port;
+            }
+        }
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+        #endregion
+
+        #region Constructor
+        public SbizAnnounce(byte[] data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException();
+            }
+            SbizMessage m = new SbizMessage(data);
+            byte[] buffer = m.Data;
+            _tcp_port = SbizNetUtils.DecapsulateInt32FromByteArray(ref buffer);
+            _name = Encoding.UTF8.GetString(buffer);   
+        }
+        #endregion
+
+        #region StaticMethods
+        public static byte[] NewToByteArray(String name, Int32 TCPport)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes(name);
+            SbizNetUtils.EncapsulateInt32inByteArray(buffer, TCPport);
+            SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, buffer);
+
+            return kam.ToByteArray();
+        }
+        #endregion
+    }
+
     [Serializable]
     public class SbizMessage
     {
@@ -50,18 +100,6 @@ namespace Sbiz.Library
             }
         }
         #endregion
-
-
-        #region StaticMethods
-        public static byte[] AnnounceMessage(Int32 TCPport){
-            byte[] buffer = new byte[0];
-            SbizNetUtils.EncapsulateInt32inByteArray(buffer, TCPport);
-            SbizMessage kam = new SbizMessage(SbizMessageConst.ANNOUNCE, buffer);
-
-            return kam.ToByteArray();
-        }
-        #endregion
-
 
         #region Constructors
         public SbizMessage(Int32 code, byte[] data)

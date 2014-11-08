@@ -15,12 +15,14 @@ namespace Sbiz.Library
     {
         private int _status;
         private string _error_message;
+        private Object _extra_arg;
 
         public const int CONNECTED = 1;
         public const int TRYING = 2;
         public const int NOT_CONNECTED = 0;
         public const int NOT_LISTENING = -2;
         public const int ERROR = -1;
+        public const int DISCOVERED_SERVER = 3;
 
         public int Status
         {
@@ -38,6 +40,14 @@ namespace Sbiz.Library
             }
         }
 
+        public Object ExtraArg
+        {
+            get
+            {
+                return _extra_arg;
+            }
+        }
+
         public SbizModelChanged_EventArgs(int status)
         {
             this._status = status;
@@ -48,6 +58,14 @@ namespace Sbiz.Library
             //TODO: logger
             this._status = status;
             this._error_message = error_message;
+        }
+
+        public SbizModelChanged_EventArgs(int status, string error_message, object extra_arg)
+        {
+            //TODO: logger
+            this._status = status;
+            this._error_message = error_message;
+            this._extra_arg = extra_arg;
         }
     }
 }
