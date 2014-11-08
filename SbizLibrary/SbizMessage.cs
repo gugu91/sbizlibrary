@@ -10,6 +10,8 @@ namespace Sbiz.Library
     {
         public const Int32 ANNOUNCE = 0;
         public const Int32 KEY_PRESS = 1;
+        public const Int32 KEY_DOWN = 2;
+        public const Int32 KEY_UP = 3;
         //Other Key events...
         public const Int32 MOUSE_ENTER = 20;
         public const Int32 MOUSE_MOVE = 21;
