@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace Sbiz.Client
+namespace Sbiz.Library
 {
     public delegate void HandleSpecialKeys(KeyEventArgs e, int down_or_up);
 
-    static class NativeImport
+    public static class NativeImport
     {
         #region Keyboard
         #region Keyboard Native Const

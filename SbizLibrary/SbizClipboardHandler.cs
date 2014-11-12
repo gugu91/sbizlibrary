@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Sbiz.Library;
 
-namespace Sbiz.Client
+namespace Sbiz.Library
 {
     public static class SbizClipboardHandler
     {
