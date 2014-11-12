@@ -8,11 +8,18 @@ namespace Sbiz.Library
 {
     public static class SbizMessageConst
     {
+        #region General (0, 99)
         public const Int32 ANNOUNCE = 0;
+        public const Int32 TARGET = 99;
+        #endregion
+
+        #region Keyboard (1-3)
         public const Int32 KEY_PRESS = 1;
         public const Int32 KEY_DOWN = 2;
         public const Int32 KEY_UP = 3;
-        //Other Key events...
+        #endregion
+
+        #region Mouse (20-26)
         public const Int32 MOUSE_ENTER = 20;
         public const Int32 MOUSE_MOVE = 21;
         public const Int32 MOUSE_HOVER = 22;
@@ -20,7 +27,14 @@ namespace Sbiz.Library
         public const Int32 MOUSE_WHEEL = 24;
         public const Int32 MOUSE_UP = 25;
         public const Int32 MOUSE_LEAVE = 26;
-        //CLipboard Events...
+        #endregion
+
+        #region Clipboard (30-33)
+        public const Int32 CLIPBOARD_AUDIO = 30;
+        public const Int32 CLIPBOARD_FILE = 31;
+        public const Int32 CLIPBOARD_IMG = 32;
+        public const Int32 CLIPBOARD_TEXT = 33;
+        #endregion
     }
 
     public class SbizAnnounce
