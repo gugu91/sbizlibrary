@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NativeImport.cs" />
+    <Compile Include="SbizClipboardHandler.cs" />
     <Compile Include="SbizLogger.cs" />
     <Compile Include="SbizModelChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

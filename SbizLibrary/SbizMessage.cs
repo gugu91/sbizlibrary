@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Sbiz.Library
 {
+    public delegate void SbizMessageSending_Delegate(SbizMessage m);
+
     public static class SbizMessageConst
     {
         #region General (0, 99)
