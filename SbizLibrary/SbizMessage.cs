@@ -33,7 +33,7 @@ namespace Sbiz.Library
         public const Int32 CLIPBOARD_AUDIO = 30;
         public const Int32 CLIPBOARD_FILE = 31;
         public const Int32 CLIPBOARD_IMG = 32;
-        public const Int32 CLIPBOARD_TEXT = 33;
+        public const Int32 CLIPBOARD_UNICODETEXT = 33;
         #endregion
     }
 
