@@ -81,6 +81,7 @@ namespace Sbiz.Library
         {
             get
             {
+                if (_ip_add == null || _tcp_port == null) return null;
                 return _ip_add.ToString() + ":" + _tcp_port.ToString();
             }
         }
@@ -105,7 +106,7 @@ namespace Sbiz.Library
         #endregion
 
         #region Client Methods
-        public void ConnectToServer(SbizModelChanged_Delegate model_changed)
+        public void ConnectToServer(SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             IPEndPoint ipe = new IPEndPoint(_ip_add, _tcp_port);
 
@@ -113,7 +114,7 @@ namespace Sbiz.Library
             if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.TRYING));
             try
             {
-                s_conn.BeginConnect(ipe, ConnectCallback, new StateObject(s_conn, model_changed));
+                s_conn.BeginConnect(ipe, ConnectCallback, new StateObject(s_conn, model_changed, view_handle));
             }
             catch(SocketException)
             {
@@ -136,7 +137,7 @@ namespace Sbiz.Library
         } // CLIENT shuts down connection with the server
         #endregion
 
-        public void SendData(byte[] data, SbizModelChanged_Delegate model_changed)
+        public void SendData(byte[] data, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             try
             {
@@ -144,7 +145,7 @@ namespace Sbiz.Library
                  * some data to not be processed by server.
                  */
                 byte[] buffer = SbizNetUtils.EncapsulateInt32inByteArray(data, data.Length);
-                s_conn.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, new StateObject(s_conn, model_changed));
+                s_conn.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, new StateObject(s_conn, model_changed, view_handle));
                 //s_conn.Send(buffer, 0, buffer.Length, SocketFlags.None);
             }
             catch (SocketException)
@@ -159,9 +160,9 @@ namespace Sbiz.Library
             }
         }
 
-        public void SendMessage(SbizMessage m, SbizModelChanged_Delegate model_changed)
+        public void SendMessage(SbizMessage m, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
-            SendData(m.ToByteArray(), model_changed);
+            SendData(m.ToByteArray(), model_changed, view_handle);
         }
 
         #region Async Callbacks
@@ -198,7 +199,7 @@ namespace Sbiz.Library
                 s.EndConnect(ar);
                 s.NoDelay = true;
                 Connected = true;
-                BeginReceiveMessageSize(s, state.model_changed);
+                BeginReceiveMessageSize(s, state.model_changed, state.view_handle);
                 if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
                     "Connected to server", this.Identifier));
             }
@@ -234,7 +235,7 @@ namespace Sbiz.Library
                 s_conn = handler;
                 Connected = true;
                 if(state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED));
-                BeginReceiveMessageSize(handler, state.model_changed);
+                BeginReceiveMessageSize(handler, state.model_changed, state.view_handle);
             }
         }
         private void ReadCallback(IAsyncResult ar)
@@ -264,7 +265,7 @@ namespace Sbiz.Library
                     /* NB there was previously a protocol error as size of the data buffer was not sent, causing
                      * some data to not be processed by server.
                      */
-                    StateObject state_out = new StateObject(handler, state.model_changed);
+                    StateObject state_out = new StateObject(handler, state.model_changed, state.view_handle);
 
                     if (state.seek == 0) //Received the size of the subsequent message
                     { 
@@ -274,7 +275,7 @@ namespace Sbiz.Library
                     else if(state.seek == sizeof(Int32)) //received a sbiz message
                     {
                         var m = new SbizMessage(state.data);
-                        if (SbizMessageConst.IsClipboardConst(m.Code)) SbizClipboardHandler.HandleClipboardSbizMessage(m);
+                        if (SbizMessageConst.IsClipboardConst(m.Code)) SbizClipboardHandler.HandleClipboardSbizMessage(m, state.view_handle);
                         else if(_message_handle != null) _message_handle(m);
 
                         state_out.datasize = sizeof(Int32);
@@ -293,12 +294,12 @@ namespace Sbiz.Library
                     Connected = false;
                 }
             }
-            if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed));
+            if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle));
         }
-        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed)
+        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             // Create the state object.
-            StateObject state_out = new StateObject(handler, model_changed);
+            StateObject state_out = new StateObject(handler, model_changed, view_handle);
             state_out.socket = handler;
             state_out.datasize = sizeof(Int32);
             state_out.seek = 0;
@@ -331,12 +332,12 @@ namespace Sbiz.Library
         /// <summary>
         /// Starts accepting and serving connections
         /// </summary>
-        public void StartServer(SbizModelChanged_Delegate model_changed)
+        public void StartServer(SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             Listening = true;
             Connected = false;
 
-            var state = new StateObject(s_listen, model_changed);
+            var state = new StateObject(s_listen, model_changed, view_handle);
             s_listen.BeginAccept(AcceptCallback, state);
         }
         /// <summary>
@@ -366,14 +367,16 @@ namespace Sbiz.Library
             public Socket socket;
             public int datasize;
             public int seek;
+            public IntPtr view_handle;
             public SbizModelChanged_Delegate model_changed;
             // Receive buffer.
             public byte[] data;
 
-            public StateObject(Socket socket, SbizModelChanged_Delegate model_changed)
+            public StateObject(Socket socket, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
             {
                 this.socket = socket;
                 this.model_changed = model_changed;
+                this.view_handle = view_handle;
             }
         }
     }

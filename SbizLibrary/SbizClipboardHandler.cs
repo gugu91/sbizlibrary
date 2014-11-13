@@ -19,13 +19,12 @@ namespace Sbiz.Library
             _message_sender -= del;
         }
 
-        public static void SendClipboardData(IDataObject data, SbizModelChanged_Delegate model_changed)
+        public static void SendClipboardData(IDataObject data, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             /* Depending on the clipboard's current data format we can process the data differently.*/
-
             if (data.GetDataPresent(DataFormats.UnicodeText))
             {
-                UnicodeTextSend((string)data.GetData(DataFormats.Text), model_changed);
+                UnicodeTextSend((string)data.GetData(DataFormats.Text), model_changed, view_handle);
                 //label.Text = "Updating Server Clipboard...";
 
 
@@ -40,15 +39,15 @@ namespace Sbiz.Library
         }*/
         }
 
-        public static void UnicodeTextSend(string text, SbizModelChanged_Delegate model_changed)
+        public static void UnicodeTextSend(string text, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             byte[] data = Encoding.BigEndianUnicode.GetBytes(text); //Network byte order il big endian
 
             SbizMessage m = new SbizMessage(SbizMessageConst.CLIPBOARD_UNICODETEXT, data);
-            if(_message_sender != null) _message_sender(m, model_changed);
+            if(_message_sender != null) _message_sender(m, model_changed, view_handle);
         }
 
-        public static bool HandleClipboardSbizMessage(SbizMessage m)
+        public static bool HandleClipboardSbizMessage(SbizMessage m, IntPtr view_handle)
         {
             IDataObject data = new DataObject();
             bool recognized = false;
@@ -78,10 +77,12 @@ namespace Sbiz.Library
 
             if (recognized)
             {
+                NativeImport.RemoveClipboardFormatListener(view_handle);
                 System.Threading.Thread thread = new System.Threading.Thread(() => Clipboard.SetDataObject(data, true, 3, 100));
                 thread.SetApartmentState(System.Threading.ApartmentState.STA); //Set the thread to STA
                 thread.Start();
-                //thread.Join(); 
+                thread.Join();
+                NativeImport.AddClipboardFormatListener(view_handle);
             }
 
             

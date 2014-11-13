@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sbiz.Library
 {
-    public delegate void SbizMessageSending_Delegate(SbizMessage m, SbizModelChanged_Delegate del);
+    public delegate void SbizMessageSending_Delegate(SbizMessage m, SbizModelChanged_Delegate del, IntPtr view_handle);
 
     public static class SbizMessageConst
     {
