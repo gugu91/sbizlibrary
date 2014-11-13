@@ -132,7 +132,6 @@ namespace Sbiz.Library
 
         #endregion
 
-
         #region Properties
         public Int32 Code
         {
@@ -169,11 +168,27 @@ namespace Sbiz.Library
         }
         #endregion
 
-
         #region InstanceMethods
         public byte[] ToByteArray()
         {
             return SbizNetUtils.EncapsulateInt32inByteArray(_data, _code);
+        }
+        #endregion
+
+        #region Static Methods
+        public static byte[] TargetToByteArray()
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes("TARGET");
+            SbizMessage kam = new SbizMessage(SbizMessageConst.TARGET, buffer);
+
+            return kam.ToByteArray();
+        }
+        public static byte[] NotTargetToByteArray()
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes("NOT_TARGET");
+            SbizMessage kam = new SbizMessage(SbizMessageConst.NOT_TARGET, buffer);
+
+            return kam.ToByteArray();
         }
         #endregion
 
