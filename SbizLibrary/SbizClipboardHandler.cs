@@ -19,7 +19,7 @@ namespace Sbiz.Library
             _message_sender -= del;
         }
 
-        public static void HandleClipboardData(IDataObject data)
+        public static void SendClipboardData(IDataObject data)
         {
             /* Depending on the clipboard's current data format we can process the data differently.*/
 
