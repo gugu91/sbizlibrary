@@ -24,7 +24,7 @@ namespace Sbiz.Library
             /* Depending on the clipboard's current data format we can process the data differently.*/
             if (data.GetDataPresent(DataFormats.UnicodeText))
             {
-                UnicodeTextSend((string)data.GetData(DataFormats.Text), model_changed, view_handle);
+                UnicodeTextSend((string)data.GetData(DataFormats.Text), model_changed);
                 //label.Text = "Updating Server Clipboard...";
 
 
@@ -39,12 +39,12 @@ namespace Sbiz.Library
         }*/
         }
 
-        public static void UnicodeTextSend(string text, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+        public static void UnicodeTextSend(string text, SbizModelChanged_Delegate model_changed)
         {
             byte[] data = Encoding.BigEndianUnicode.GetBytes(text); //Network byte order il big endian
 
             SbizMessage m = new SbizMessage(SbizMessageConst.CLIPBOARD_UNICODETEXT, data);
-            if(_message_sender != null) _message_sender(m, model_changed, view_handle);
+            if(_message_sender != null) _message_sender(m, model_changed);
         }
 
         public static bool HandleClipboardSbizMessage(SbizMessage m, IntPtr view_handle)

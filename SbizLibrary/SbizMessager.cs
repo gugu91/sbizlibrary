@@ -16,6 +16,7 @@ namespace Sbiz.Library
         private Socket s_conn;
         private IPAddress _ip_add;
         private int _tcp_port;
+        private IntPtr _view_handle;
         private SbizMessageHandle_Delegate _message_handle;
         #endregion
 
@@ -137,7 +138,7 @@ namespace Sbiz.Library
         } // CLIENT shuts down connection with the server
         #endregion
 
-        public void SendData(byte[] data, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+        public void SendData(byte[] data, SbizModelChanged_Delegate model_changed)
         {
             try
             {
@@ -145,7 +146,7 @@ namespace Sbiz.Library
                  * some data to not be processed by server.
                  */
                 byte[] buffer = SbizNetUtils.EncapsulateInt32inByteArray(data, data.Length);
-                s_conn.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, new StateObject(s_conn, model_changed, view_handle));
+                s_conn.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, new StateObject(s_conn, model_changed, _view_handle));
                 //s_conn.Send(buffer, 0, buffer.Length, SocketFlags.None);
             }
             catch (SocketException)
@@ -160,9 +161,9 @@ namespace Sbiz.Library
             }
         }
 
-        public void SendMessage(SbizMessage m, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+        public void SendMessage(SbizMessage m, SbizModelChanged_Delegate model_changed)
         {
-            SendData(m.ToByteArray(), model_changed, view_handle);
+            SendData(m.ToByteArray(), model_changed);
         }
 
         #region Async Callbacks

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Sbiz.Library
 {
-    public delegate void HandleSpecialKeys(KeyEventArgs e, int down_or_up);
+    public delegate void HandleSpecialKeys(KeyEventArgs e, int down_or_up, IntPtr view_handle);
 
     public static class NativeImport
     {
@@ -67,7 +67,7 @@ namespace Sbiz.Library
                     objKeyInfo.key == Keys.Tab && HasAltModifier(objKeyInfo.flags) || //Alt+Tab
                     objKeyInfo.key == Keys.Escape && (Control.ModifierKeys & Keys.Control) == Keys.Control) //Ctrl+Esc
                 {
-                    if (_special_keys_handler != null) _special_keys_handler(new KeyEventArgs(objKeyInfo.key | Control.ModifierKeys), wp.ToInt32());
+                    if (_special_keys_handler != null) _special_keys_handler(new KeyEventArgs(objKeyInfo.key | Control.ModifierKeys), wp.ToInt32(), lp);
                     return (IntPtr)1; // if 0 is returned then All the above keys will be enabled
                 }
             }
