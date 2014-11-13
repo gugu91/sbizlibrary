@@ -10,9 +10,10 @@ namespace Sbiz.Library
 
     public static class SbizMessageConst
     {
-        #region General (0, 99)
+        #region General (0, 98, 99)
         public const Int32 ANNOUNCE = 0;
         public const Int32 TARGET = 99;
+        public const Int32 NOT_TARGET = 98;
         #endregion
 
         #region Keyboard (1-3)
