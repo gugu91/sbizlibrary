@@ -87,6 +87,15 @@ namespace Sbiz.Library
             }
         }
 
+        public void RegisterMessageHandle(SbizMessageHandle_Delegate del)
+        {
+            _message_handle += del;
+        }
+        public void UnregisterMessageHandle(SbizMessageHandle_Delegate del)
+        {
+            _message_handle -= del;
+        }
+
         #region Constructors
         public SbizMessager() // SERVER call this construstor to istanciate a server
         {
@@ -277,12 +286,6 @@ namespace Sbiz.Library
                     {
                         var m = new SbizMessage(state.data);
                         if (SbizMessageConst.IsClipboardConst(m.Code)) SbizClipboardHandler.HandleClipboardSbizMessage(m, state.view_handle);
-                        else if (m.Code == SbizMessageConst.TARGET) 
-                            if (state.model_changed != null) 
-                                state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.TARGET));
-                        else if (m.Code == SbizMessageConst.NOT_TARGET)
-                            if (state.model_changed != null) 
-                                state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.NOT_TARGET));
                         else if(_message_handle != null) _message_handle(m);
 
                         state_out.datasize = sizeof(Int32);
