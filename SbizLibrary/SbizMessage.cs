@@ -37,6 +37,37 @@ namespace Sbiz.Library
         public const Int32 CLIPBOARD_IMG = 32;
         public const Int32 CLIPBOARD_UNICODETEXT = 33;
         #endregion
+
+        public static bool IsClipboardConst(Int32 c)
+        {
+            if (c == SbizMessageConst.CLIPBOARD_UNICODETEXT || c == SbizMessageConst.CLIPBOARD_IMG||
+                c == SbizMessageConst.CLIPBOARD_FILE || c == SbizMessageConst.CLIPBOARD_AUDIO)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        public static bool IsMouseConst(Int32 c)
+        {
+            if (c == SbizMessageConst.MOUSE_MOVE || c == SbizMessageConst.MOUSE_UP ||
+                c == SbizMessageConst.MOUSE_DOWN || c == SbizMessageConst.MOUSE_WHEEL)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        public static bool IsKeyConst(Int32 c)
+        {
+            if (c == SbizMessageConst.KEY_PRESS || c == SbizMessageConst.KEY_DOWN ||
+                c == SbizMessageConst.KEY_UP)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     public class SbizAnnounce
