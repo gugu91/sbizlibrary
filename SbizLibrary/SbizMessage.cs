@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace Sbiz.Library
 {
+    public delegate void SbizMessageSending_Delegate(SbizMessage m, SbizModelChanged_Delegate del);
+
     public static class SbizMessageConst
     {
-        #region General (0, 99)
+        #region General (0, 98, 99)
         public const Int32 ANNOUNCE = 0;
         public const Int32 TARGET = 99;
+        public const Int32 NOT_TARGET = 98;
         #endregion
 
         #region Keyboard (1-3)
@@ -33,8 +36,39 @@ namespace Sbiz.Library
         public const Int32 CLIPBOARD_AUDIO = 30;
         public const Int32 CLIPBOARD_FILE = 31;
         public const Int32 CLIPBOARD_IMG = 32;
-        public const Int32 CLIPBOARD_TEXT = 33;
+        public const Int32 CLIPBOARD_UNICODETEXT = 33;
         #endregion
+
+        public static bool IsClipboardConst(Int32 c)
+        {
+            if (c == SbizMessageConst.CLIPBOARD_UNICODETEXT || c == SbizMessageConst.CLIPBOARD_IMG||
+                c == SbizMessageConst.CLIPBOARD_FILE || c == SbizMessageConst.CLIPBOARD_AUDIO)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        public static bool IsMouseConst(Int32 c)
+        {
+            if (c == SbizMessageConst.MOUSE_MOVE || c == SbizMessageConst.MOUSE_UP ||
+                c == SbizMessageConst.MOUSE_DOWN || c == SbizMessageConst.MOUSE_WHEEL)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        public static bool IsKeyConst(Int32 c)
+        {
+            if (c == SbizMessageConst.KEY_PRESS || c == SbizMessageConst.KEY_DOWN ||
+                c == SbizMessageConst.KEY_UP)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     public class SbizAnnounce

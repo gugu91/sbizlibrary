@@ -23,6 +23,9 @@ namespace Sbiz.Library
         public const int NOT_LISTENING = -2;
         public const int ERROR = -1;
         public const int DISCOVERED_SERVER = 3;
+        public const int CLIPBOARD_UPDATE = 30;
+        public const int TARGET = 10;
+        public const int NOT_TARGET = 11;
 
         public int Status
         {
