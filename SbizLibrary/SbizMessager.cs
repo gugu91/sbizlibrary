@@ -82,7 +82,7 @@ namespace Sbiz.Library
         {
             get
             {
-                if (_ip_add == null || _tcp_port == null) return null;
+                if (_ip_add == null) return null;
                 return _ip_add.ToString() + ":" + _tcp_port.ToString();
             }
         }
