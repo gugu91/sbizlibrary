@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using Sbiz.Library;
 
-namespace Sbiz.Client
+namespace Sbiz.Library
 {
     public delegate void SbizMessageHandle_Delegate(SbizMessage m);
     public class SbizMessager
@@ -20,10 +20,10 @@ namespace Sbiz.Client
         #endregion
 
         #region Thread Safe Properties
-        private int _connected; //NB never refer to this object as it is not thread safe
-        private int _listening;
         private const int YES = 1;
         private const int NO = 0;
+        private int _connected = NO; //NB never refer to this object as it is not thread safe
+        private int _listening = NO;
         public bool Connected
         {
             get
@@ -38,11 +38,21 @@ namespace Sbiz.Client
             {
                 if (value)
                 {
-                    System.Threading.Interlocked.Exchange(ref _connected, YES);
+                    if (_connected == NO)
+                    {
+                        SbizClipboardHandler.RegisterSbizMessageSendingDelegate(this.SendMessage);//Start Sniffing the clipboard
+                        System.Threading.Interlocked.Exchange(ref _connected, YES);
+                    }
+
                 }
                 else
                 {
-                    System.Threading.Interlocked.Exchange(ref _connected, NO);
+                    if (_connected == YES)
+                    {
+                        SbizClipboardHandler.UnregisterSbizMessageSendingDelegate(this.SendMessage);//Stop Sniffing the clipboard
+                        System.Threading.Interlocked.Exchange(ref _connected, NO);
+                    }
+
                 }
             }
         }
@@ -80,12 +90,17 @@ namespace Sbiz.Client
         {
             s_listen = null;
             s_conn = null;
+            Connected = false;
+            Listening = false;
         }
         public SbizMessager(IPAddress ip, int tcp_port) // CLIENT call this constructor to istanciate a client
         {
             _ip_add = ip;
             _tcp_port = tcp_port;
+            s_listen = null;
+            s_conn = null;
             Connected = false;
+            Listening = false;
         }
         #endregion
 
@@ -111,11 +126,10 @@ namespace Sbiz.Client
         {
             if (Connected)
             {
-                SbizClipboardHandler.UnregisterSbizMessageSendingDelegate(this.SendMessage);
+                Connected = false;
                 s_conn.Shutdown(SocketShutdown.Both);
                 s_conn.Close();
 
-                Connected = false;
                 if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.NOT_CONNECTED,
                     "Not connected to server", this.Identifier));
             }
@@ -138,6 +152,7 @@ namespace Sbiz.Client
                 if (Connected)
                 {
                     Connected = false;
+
                     if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, 
                         "Server disconnected", this.Identifier));
                 }
@@ -183,7 +198,7 @@ namespace Sbiz.Client
                 s.EndConnect(ar);
                 s.NoDelay = true;
                 Connected = true;
-                SbizClipboardHandler.RegisterSbizMessageSendingDelegate(this.SendMessage);//Start Sniffing the clipboard
+                BeginReceiveMessageSize(s, state.model_changed);
                 if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
                     "Connected to server", this.Identifier));
             }
@@ -217,22 +232,20 @@ namespace Sbiz.Client
                 }
                 
                 s_conn = handler;
-
+                Connected = true;
                 if(state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED));
-
-                ReceiveMessageSize(handler, state.model_changed);
+                BeginReceiveMessageSize(handler, state.model_changed);
             }
         }
         private void ReadCallback(IAsyncResult ar)
         {
-            if (Listening)
+            // Retrieve the state object and the handler socket
+            // from the asynchronous state object.
+            StateObject state = (StateObject)ar.AsyncState;
+            Socket handler = state.socket;
+
+            if (Connected)
             {
-                // Retrieve the state object and the handler socket
-                // from the asynchronous state object.
-                StateObject state = (StateObject)ar.AsyncState;
-
-                Socket handler = state.socket;
-
                 int bytesRead;
                 try
                 {
@@ -273,15 +286,16 @@ namespace Sbiz.Client
                     handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
                         new AsyncCallback(ReadCallback), state_out);
                 }
-                else//clientshutdown
+                else//peershutdown
                 {
-                    if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.NOT_CONNECTED));
-                    s_conn = null;
-                    s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed));
+                    if (state.model_changed != null) state.model_changed(this, 
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR,"Server disconnected", this.Identifier));
+                    Connected = false;
                 }
             }
+            if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed));
         }
-        private void ReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed)
+        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed)
         {
             // Create the state object.
             StateObject state_out = new StateObject(handler, model_changed);
@@ -320,6 +334,7 @@ namespace Sbiz.Client
         public void StartServer(SbizModelChanged_Delegate model_changed)
         {
             Listening = true;
+            Connected = false;
 
             var state = new StateObject(s_listen, model_changed);
             s_listen.BeginAccept(AcceptCallback, state);
@@ -330,6 +345,7 @@ namespace Sbiz.Client
         public void StopServer(SbizModelChanged_Delegate model_changed)
         {
             Listening = false;
+            Connected = false;
 
             if (s_conn != null)
             {
