@@ -19,13 +19,13 @@ namespace Sbiz.Library
             _message_sender -= del;
         }
 
-        public static void SendClipboardData(IDataObject data)
+        public static void SendClipboardData(IDataObject data, SbizModelChanged_Delegate model_changed)
         {
             /* Depending on the clipboard's current data format we can process the data differently.*/
 
             if (data.GetDataPresent(DataFormats.UnicodeText))
             {
-                UnicodeTextSend((string)data.GetData(DataFormats.Text));
+                UnicodeTextSend((string)data.GetData(DataFormats.Text), model_changed);
                 //label.Text = "Updating Server Clipboard...";
 
 
@@ -40,12 +40,12 @@ namespace Sbiz.Library
         }*/
         }
 
-        public static void UnicodeTextSend(string text)
+        public static void UnicodeTextSend(string text, SbizModelChanged_Delegate model_changed)
         {
             byte[] data = Encoding.BigEndianUnicode.GetBytes(text); //Network byte order il big endian
 
             SbizMessage m = new SbizMessage(SbizMessageConst.CLIPBOARD_UNICODETEXT, data);
-            if(_message_sender != null) _message_sender(m);
+            if(_message_sender != null) _message_sender(m, model_changed);
         }
 
         public static bool HandleClipboardSbizMessage(SbizMessage m)
