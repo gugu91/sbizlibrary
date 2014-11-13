@@ -48,7 +48,7 @@ namespace Sbiz.Library
             if(_message_sender != null) _message_sender(m);
         }
 
-        public static bool ReceiveClipboardSbizMessage(SbizMessage m)
+        public static bool HandleClipboardSbizMessage(SbizMessage m)
         {
             IDataObject data = new DataObject();
             bool recognized = false;
