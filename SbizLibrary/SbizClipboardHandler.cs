@@ -10,16 +10,16 @@ namespace Sbiz.Library
     public static class SbizClipboardHandler
     {
         private static SbizMessageSending_Delegate _message_sender;
-        public static void RegisterMessageSendingDelegate(SbizMessageSending_Delegate del)
+        public static void RegisterSbizMessageSendingDelegate(SbizMessageSending_Delegate del)
         {
             _message_sender += del;
         }
-        public static void UnregisterSendingDelegate(SbizMessageSending_Delegate del)
+        public static void UnregisterSbizMessageSendingDelegate(SbizMessageSending_Delegate del)
         {
             _message_sender -= del;
         }
 
-        public static void HandleClipboardData(Label label, IDataObject data)
+        public static void HandleClipboardData(IDataObject data)
         {
             /* Depending on the clipboard's current data format we can process the data differently.*/
 
@@ -45,7 +45,7 @@ namespace Sbiz.Library
             byte[] data = Encoding.BigEndianUnicode.GetBytes(text); //Network byte order il big endian
 
             SbizMessage m = new SbizMessage(SbizMessageConst.CLIPBOARD_UNICODETEXT, data);
-            _message_sender(m);
+            if(_message_sender != null) _message_sender(m);
         }
 
         public static bool ClipboardMessageReceive(SbizMessage m)
