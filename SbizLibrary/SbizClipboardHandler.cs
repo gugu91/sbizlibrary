@@ -76,7 +76,15 @@ namespace Sbiz.Library
                 recognized = true;
             }
 
-            Clipboard.SetDataObject(data, true);
+            if (recognized)
+            {
+                System.Threading.Thread thread = new System.Threading.Thread(() => Clipboard.SetDataObject(data, true, 3, 100));
+                thread.SetApartmentState(System.Threading.ApartmentState.STA); //Set the thread to STA
+                thread.Start();
+                //thread.Join(); 
+            }
+
+            
 
             return recognized;
         }

@@ -50,7 +50,6 @@
     <Compile Include="SbizMessage.cs" />
     <Compile Include="SbizConf.cs" />
     <Compile Include="SbizMouseEventArgs.cs" />
-    <Compile Include="SbizQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="WindowsInput\WindowsInput.csproj">
