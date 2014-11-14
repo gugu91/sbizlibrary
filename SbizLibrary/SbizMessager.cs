@@ -72,6 +72,7 @@ namespace Sbiz.Library
                 }
                 else
                 {
+                    Connected = false;
                     System.Threading.Interlocked.Exchange(ref _listening, NO);
                 }
             }
@@ -209,6 +210,8 @@ namespace Sbiz.Library
                 s.EndConnect(ar);
                 s.NoDelay = true;
                 Connected = true;
+                var m = new SbizMessage(SbizMessageConst.AUTHENTICATE, Encoding.UTF8.GetBytes("Password"));
+                SendMessage(m, state.model_changed);
                 BeginReceiveMessageSize(s, state.model_changed, state.view_handle);
                 if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
                     "Connected to server", this.Identifier));
@@ -285,8 +288,7 @@ namespace Sbiz.Library
                     else if(state.seek == sizeof(Int32)) //received a sbiz message
                     {
                         var m = new SbizMessage(state.data);
-                        if (SbizMessageConst.IsClipboardConst(m.Code)) SbizClipboardHandler.HandleClipboardSbizMessage(m, state.view_handle);
-                        else if(_message_handle != null) _message_handle(m);
+                        HandleReceivedSbizMessage(m, state);
 
                         state_out.datasize = sizeof(Int32);
                         state_out.seek = 0;
@@ -306,6 +308,7 @@ namespace Sbiz.Library
             }
             if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle));
         }
+
         private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
         {
             // Create the state object.
@@ -316,6 +319,18 @@ namespace Sbiz.Library
             state_out.data = new byte[state_out.datasize];
             handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
                 new AsyncCallback(ReadCallback), state_out);
+        }
+
+        private void HandleReceivedSbizMessage(SbizMessage m, StateObject state)
+        {
+            if (SbizMessageConst.IsClipboardConst(m.Code))
+            {
+                SbizClipboardHandler.HandleClipboardSbizMessage(m, state.view_handle);
+            }
+            else if (_message_handle != null)
+            {
+                _message_handle(m);
+            }
         }
         #endregion
 
@@ -370,6 +385,19 @@ namespace Sbiz.Library
             }
             model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.NOT_LISTENING));
         }
+        public void CloseConnectionWithClient(SbizModelChanged_Delegate model_changed)
+        {
+            Connected = false;
+
+            if (s_conn != null)
+            {
+                s_conn.Close();
+                s_conn = null;
+            }
+
+            model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.NOT_CONNECTED));
+        }
+
         #endregion
 
         private class StateObject

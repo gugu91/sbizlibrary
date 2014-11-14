@@ -12,6 +12,7 @@ namespace Sbiz.Library
     {
         #region General (0, 98, 99)
         public const Int32 ANNOUNCE = 0;
+        public const Int32 AUTHENTICATE = 10;
         public const Int32 TARGET = 99;
         public const Int32 NOT_TARGET = 98;
         #endregion
