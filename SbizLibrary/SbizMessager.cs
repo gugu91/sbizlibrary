@@ -146,8 +146,7 @@ namespace Sbiz.Library
             if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.TRYING));
             try
             {
-                var state = new StateObject(s_conn, model_changed, view_handle);
-                state.key = key; //For authentication
+                var state = new StateObject(s_conn, model_changed, view_handle, key);
                 s_conn.BeginConnect(ipe, ConnectCallback, state);
             }
             catch(SocketException)
@@ -327,18 +326,18 @@ namespace Sbiz.Library
                     Connected = false;
                 }
             }
-            if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle));
+            if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle, state.key));
         }
 
         private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key)
         {
             // Create the state object.
-            StateObject state_out = new StateObject(handler, model_changed, view_handle);
+            StateObject state_out = new StateObject(handler, model_changed, view_handle, key);
             state_out.socket = handler;
             state_out.datasize = sizeof(Int32);
             state_out.seek = 0;
             state_out.data = new byte[state_out.datasize];
-            state_out.key = key;
+            handler.ReceiveTimeout = 1000;
             handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
                 new AsyncCallback(ReadCallback), state_out);
         }
@@ -470,11 +469,12 @@ namespace Sbiz.Library
             // Receive buffer.
             public byte[] data;
 
-            public StateObject(Socket socket, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+            public StateObject(Socket socket, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key = null)
             {
                 this.socket = socket;
                 this.model_changed = model_changed;
                 this.view_handle = view_handle;
+                this.key = key;
             }
         }
     }
