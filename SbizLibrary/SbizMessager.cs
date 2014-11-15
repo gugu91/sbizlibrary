@@ -270,7 +270,7 @@ namespace Sbiz.Library
                 s_conn = handler;
                 Connected = true;
                 if(state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED));
-                BeginReceiveMessageSize(handler, state.model_changed, state.view_handle);
+                BeginReceiveMessageSize(handler, state.model_changed, state.view_handle, state.key);
             }
         }
         private void ReadCallback(IAsyncResult ar)
@@ -316,6 +316,7 @@ namespace Sbiz.Library
                         state_out.seek = 0;
                     }
 
+                    state_out.key = state.key;
                     state_out.data = new byte[state_out.datasize];
 
                     handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
@@ -331,7 +332,7 @@ namespace Sbiz.Library
             if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle));
         }
 
-        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key=null)
         {
             // Create the state object.
             StateObject state_out = new StateObject(handler, model_changed, view_handle);
@@ -339,6 +340,7 @@ namespace Sbiz.Library
             state_out.datasize = sizeof(Int32);
             state_out.seek = 0;
             state_out.data = new byte[state_out.datasize];
+            state_out.key = key;
             handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
                 new AsyncCallback(ReadCallback), state_out);
         }
@@ -347,7 +349,7 @@ namespace Sbiz.Library
         {
             if (!Authenticated)
             {
-                if (!AuthenticateClient(m, (IPEndPoint)state.socket.RemoteEndPoint))
+                if (!AuthenticateClient(m, state.key, (IPEndPoint)state.socket.RemoteEndPoint))
                 {
                     if(state.model_changed != null) state.model_changed(this,
                         new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed"));
@@ -367,9 +369,9 @@ namespace Sbiz.Library
             }
         }
 
-        public bool AuthenticateClient (SbizMessage m, IPEndPoint ipe)
+        public bool AuthenticateClient (SbizMessage m, string key, IPEndPoint ipe)
         {
-            byte[] valid = SbizMessage.AutenticationPayload("password", ipe);
+            byte[] valid = SbizMessage.AutenticationPayload(key, ipe);
             if (m.Code == SbizMessageConst.AUTHENTICATE)
 
                 if (System.Linq.Enumerable.SequenceEqual(m.Data, valid))
@@ -402,12 +404,13 @@ namespace Sbiz.Library
         /// <summary>
         /// Starts accepting and serving connections
         /// </summary>
-        public void StartServer(SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+        public void StartServer(SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key)
         {
             Listening = true;
             Connected = false;
 
             var state = new StateObject(s_listen, model_changed, view_handle);
+            state.key = key;
             s_listen.BeginAccept(AcceptCallback, state);
         }
         /// <summary>
