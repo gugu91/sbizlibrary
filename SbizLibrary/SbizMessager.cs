@@ -233,7 +233,7 @@ namespace Sbiz.Library
                 s.EndConnect(ar);
                 s.NoDelay = true;
                 Connected = true;
-                SendData(SbizMessage.AuthenticationMessage(state.key, new IPEndPoint(_ip_add, _tcp_port)), state.model_changed);
+                SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)s.LocalEndPoint), state.model_changed);
                 BeginReceiveMessageSize(s, state.model_changed, state.view_handle);
                 if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
                     "Connected to server", this.Identifier));
@@ -347,7 +347,7 @@ namespace Sbiz.Library
 
         private void HandleReceivedSbizMessage(SbizMessage m, StateObject state)
         {
-            if (!Authenticated)
+            if (Listening && !Authenticated)
             {
                 if (!AuthenticateClient(m, state.key, (IPEndPoint)state.socket.RemoteEndPoint))
                 {
