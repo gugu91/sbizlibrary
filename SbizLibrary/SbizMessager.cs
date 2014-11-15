@@ -234,7 +234,7 @@ namespace Sbiz.Library
                 s.NoDelay = true;
                 Connected = true;
                 SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)s.LocalEndPoint), state.model_changed);
-                BeginReceiveMessageSize(s, state.model_changed, state.view_handle);
+                BeginReceiveMessageSize(s, state.model_changed, state.view_handle, state.key);
             }
             catch (SocketException)
             {
@@ -330,7 +330,7 @@ namespace Sbiz.Library
             if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle));
         }
 
-        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key=null)
+        private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key)
         {
             // Create the state object.
             StateObject state_out = new StateObject(handler, model_changed, view_handle);
