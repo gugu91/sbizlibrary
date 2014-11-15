@@ -117,7 +117,7 @@ namespace Sbiz.Library
         #endregion
 
         #region Client Methods
-        public void ConnectToServer(SbizModelChanged_Delegate model_changed, IntPtr view_handle)
+        public void ConnectToServer(SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key)
         {
             IPEndPoint ipe = new IPEndPoint(_ip_add, _tcp_port);
 
@@ -125,7 +125,9 @@ namespace Sbiz.Library
             if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.TRYING));
             try
             {
-                s_conn.BeginConnect(ipe, ConnectCallback, new StateObject(s_conn, model_changed, view_handle));
+                var state = new StateObject(s_conn, model_changed, view_handle);
+                state.key = key; //For authentication
+                s_conn.BeginConnect(ipe, ConnectCallback, state);
             }
             catch(SocketException)
             {
@@ -210,8 +212,7 @@ namespace Sbiz.Library
                 s.EndConnect(ar);
                 s.NoDelay = true;
                 Connected = true;
-                var m = new SbizMessage(SbizMessageConst.AUTHENTICATE, Encoding.UTF8.GetBytes("Password"));
-                SendMessage(m, state.model_changed);
+                SendData(SbizMessage.AuthenticationMessage(state.key), state.model_changed);
                 BeginReceiveMessageSize(s, state.model_changed, state.view_handle);
                 if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
                     "Connected to server", this.Identifier));
@@ -407,6 +408,7 @@ namespace Sbiz.Library
             public int seek;
             public IntPtr view_handle;
             public SbizModelChanged_Delegate model_changed;
+            public string key;
             // Receive buffer.
             public byte[] data;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace Sbiz.Library
 {
@@ -190,6 +191,25 @@ namespace Sbiz.Library
             SbizMessage kam = new SbizMessage(SbizMessageConst.NOT_TARGET, buffer);
 
             return kam.ToByteArray();
+        }
+
+        public static byte[] AuthenticationMessage(string key)
+        {
+            byte[] buffer = Encoding.UTF8.GetBytes("THANKS_FOR_USING_SBIZ_AUTHENTICATION_PROTOCOL");
+            
+            using (HMACMD5 hmac = new HMACMD5(Encoding.UTF8.GetBytes(key)))
+            {
+                SbizMessage kam = new SbizMessage(SbizMessageConst.AUTHENTICATE, hmac.ComputeHash(buffer));
+                return kam.ToByteArray();
+            }
+        }
+
+        public static byte[] AutenticationPayload(string key)
+        {
+            using (HMACMD5 hmac = new HMACMD5(Encoding.UTF8.GetBytes(key)))
+            {
+                return hmac.ComputeHash(Encoding.UTF8.GetBytes("THANKS_FOR_USING_SBIZ_AUTHENTICATION_PROTOCOL"));
+            }
         }
         #endregion
 
