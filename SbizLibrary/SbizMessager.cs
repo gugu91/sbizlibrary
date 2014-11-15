@@ -173,7 +173,6 @@ namespace Sbiz.Library
 
         public void SendData(byte[] data, SbizModelChanged_Delegate model_changed)
         {
-            if (!Authenticated) return;
             try
             {
                 /* NB there was previously a protocol error as size of the data buffer was not sent, causing
@@ -236,8 +235,6 @@ namespace Sbiz.Library
                 Connected = true;
                 SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)s.LocalEndPoint), state.model_changed);
                 BeginReceiveMessageSize(s, state.model_changed, state.view_handle);
-                if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
-                    "Connected to server", this.Identifier));
             }
             catch (SocketException)
             {
@@ -356,10 +353,18 @@ namespace Sbiz.Library
                         new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed"));
                     CloseConnectionWithClient(state.model_changed);
                 }
-
-                if(Listening) 
+                else
                 {
-                    SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)state.socket.LocalEndPoint), state.model_changed);
+                    if (Listening) //This is a server
+                    {
+                        SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)state.socket.LocalEndPoint), state.model_changed);
+                    }
+                    else //This is a client
+                    {
+                        if (state.model_changed != null)
+                            state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
+                            "Connected to server", this.Identifier));
+                    }
                 }
             }
             else
