@@ -320,7 +320,7 @@ namespace Sbiz.Library
                     state_out.data = new byte[state_out.datasize];
 
                     handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
-                        new AsyncCallback(ReadCallback), state_out);
+                        new AsyncCallback(ReadCallback), state_out); //TODO handle object disposed exception fails here if auth failed
                 }
                 else//peershutdown
                 {
