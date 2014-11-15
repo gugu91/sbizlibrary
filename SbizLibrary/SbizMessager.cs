@@ -25,6 +25,26 @@ namespace Sbiz.Library
         private const int NO = 0;
         private int _connected = NO; //NB never refer to this object as it is not thread safe
         private int _listening = NO;
+        private static int _authenticated = NO;
+        public static bool Authenticated
+        {
+            get
+            {
+                if (_authenticated == YES) return true;
+                else return false;
+            }
+            set
+            {
+                if (value)
+                {
+                    System.Threading.Interlocked.Exchange(ref _authenticated, YES);
+                }
+                else
+                {
+                    System.Threading.Interlocked.Exchange(ref _authenticated, NO);
+                }
+            }
+        } //NB If connected is set to false also authenticated automatically
         public bool Connected
         {
             get
@@ -52,11 +72,12 @@ namespace Sbiz.Library
                     {
                         SbizClipboardHandler.UnregisterSbizMessageSendingDelegate(this.SendMessage);//Stop Sniffing the clipboard
                         System.Threading.Interlocked.Exchange(ref _connected, NO);
+                        Authenticated = false;
                     }
 
                 }
             }
-        }
+        }  //NB If Listening is set to false also authenticated automatically
         public bool Listening
         {
             get
@@ -324,14 +345,37 @@ namespace Sbiz.Library
 
         private void HandleReceivedSbizMessage(SbizMessage m, StateObject state)
         {
-            if (SbizMessageConst.IsClipboardConst(m.Code))
+            if (!Authenticated)
             {
-                SbizClipboardHandler.HandleClipboardSbizMessage(m, state.view_handle);
+                if (!AuthenticateClient(m, (IPEndPoint)state.socket.RemoteEndPoint))
+                {
+                    if(state.model_changed != null) state.model_changed(this,
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed"));
+                    CloseConnectionWithClient(state.model_changed);
+                }
             }
-            else if (_message_handle != null)
+            else
             {
-                _message_handle(m);
+                if (SbizMessageConst.IsClipboardConst(m.Code))
+                {
+                    SbizClipboardHandler.HandleClipboardSbizMessage(m, state.view_handle);
+                }
+                else if (_message_handle != null)
+                {
+                    _message_handle(m);
+                }
             }
+        }
+
+        public bool AuthenticateClient (SbizMessage m, IPEndPoint ipe)
+        {
+            byte[] valid = SbizMessage.AutenticationPayload("password", ipe);
+            if (m.Code == SbizMessageConst.AUTHENTICATE)
+
+                if (System.Linq.Enumerable.SequenceEqual(m.Data, valid))
+                    Authenticated = true;
+
+            return Authenticated;
         }
         #endregion
 
