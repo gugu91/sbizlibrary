@@ -193,22 +193,18 @@ namespace Sbiz.Library
             return kam.ToByteArray();
         }
 
-        public static byte[] AuthenticationMessage(string key)
+        public static byte[] AuthenticationMessage(string key, System.Net.IPEndPoint ipe)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes("THANKS_FOR_USING_SBIZ_AUTHENTICATION_PROTOCOL");
-            
-            using (HMACMD5 hmac = new HMACMD5(Encoding.UTF8.GetBytes(key)))
-            {
-                SbizMessage kam = new SbizMessage(SbizMessageConst.AUTHENTICATE, hmac.ComputeHash(buffer));
-                return kam.ToByteArray();
-            }
+            SbizMessage kam = new SbizMessage(SbizMessageConst.AUTHENTICATE, AutenticationPayload(key, ipe));
+            return kam.ToByteArray();
         }
 
-        public static byte[] AutenticationPayload(string key)
+        public static byte[] AutenticationPayload(string key, System.Net.IPEndPoint ipe)
         {
+            string secret_payload = ipe.Address.ToString() + ":" + ipe.Port.ToString();
             using (HMACMD5 hmac = new HMACMD5(Encoding.UTF8.GetBytes(key)))
             {
-                return hmac.ComputeHash(Encoding.UTF8.GetBytes("THANKS_FOR_USING_SBIZ_AUTHENTICATION_PROTOCOL"));
+                return hmac.ComputeHash(Encoding.UTF8.GetBytes(secret_payload));
             }
         }
         #endregion
