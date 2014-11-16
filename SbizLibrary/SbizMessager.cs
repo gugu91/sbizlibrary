@@ -187,8 +187,8 @@ namespace Sbiz.Library
                 {
                     Connected = false;
 
-                    if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, 
-                        "Server disconnected", this.Identifier));
+                    if (model_changed != null) model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN, 
+                        "Remote endpoint disconnected", this.Identifier));
                 }
             }
         }
@@ -218,8 +218,8 @@ namespace Sbiz.Library
                 if (nbyte < 0 && Connected)
                 {
                     Connected = false;
-                    if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR,
-                        "Server disconnected", this.Identifier));
+                    if (state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN,
+                        "Remote endpoint disconnected", this.Identifier));
                 }
             }
         }
@@ -325,7 +325,7 @@ namespace Sbiz.Library
                     catch (ObjectDisposedException)
                     {
                         if (state.model_changed != null) state.model_changed(this,
-                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Peer disconnected", this.Identifier));
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN, "Remote endpoint disconnected", this.Identifier));
                         Connected = false;
                     }
                     
@@ -333,7 +333,7 @@ namespace Sbiz.Library
                 else//peershutdown
                 {
                     if (state.model_changed != null) state.model_changed(this, 
-                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR,"Peer disconnected", this.Identifier));
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN,"Remote endpoint disconnected", this.Identifier));
                     Connected = false;
                 }
             }
@@ -364,7 +364,7 @@ namespace Sbiz.Library
                         SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)state.socket.LocalEndPoint), state.model_changed);
                     }
                     if(state.model_changed != null) state.model_changed(this,
-                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed", this.Identifier));
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.AUTH_FAILED, "Authentication failed, probably incorrect password", this.Identifier));
                     Connected = false;
                     if (s_conn != null)
                     {

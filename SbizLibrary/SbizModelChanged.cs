@@ -20,13 +20,16 @@ namespace Sbiz.Library
         public const int CONNECTED = 1;
         public const int TRYING = 2;
         public const int NOT_CONNECTED = 0;
-        public const int NOT_LISTENING = -2;
-        public const int ERROR = -1;
         public const int DISCOVERED_SERVER = 3;
         public const int CLIPBOARD_UPDATE = 30;
         public const int TARGET = 10;
         public const int NOT_TARGET = 11;
-
+        #region Errors
+        public const int NOT_LISTENING = -2;
+        public const int ERROR = -1;
+        public const int PEER_SHUTDOWN = -3;
+        public const int AUTH_FAILED = -4;
+        #endregion
         public int Status
         {
             get
