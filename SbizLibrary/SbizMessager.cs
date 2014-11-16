@@ -266,7 +266,6 @@ namespace Sbiz.Library
                 
                 s_conn = handler;
                 Connected = true;
-                if(state.model_changed != null) state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED));
                 BeginReceiveMessageSize(handler, state.model_changed, state.view_handle, state.key);
             }
         }
@@ -379,12 +378,9 @@ namespace Sbiz.Library
                     {
                         SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)state.socket.LocalEndPoint), state.model_changed);
                     }
-                    else //This is a client
-                    {
-                        if (state.model_changed != null)
-                            state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
-                            "Connected to server", this.Identifier));
-                    }
+                    if (state.model_changed != null)
+                        state.model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.CONNECTED,
+                        "Connected to remote endpoint", this.Identifier));
                 }
             }
             else
