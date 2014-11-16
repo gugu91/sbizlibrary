@@ -322,7 +322,7 @@ namespace Sbiz.Library
                         new AsyncCallback(ReadCallback), state_out); //TODO handle object disposed exception fails 
                                                                     //here if auth failed on server
                     }
-                    catch (ObjectDisposedException)
+                    catch (Exception)
                     {
                         if (state.model_changed != null) state.model_changed(this,
                         new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN, "Remote endpoint disconnected", this.Identifier));
