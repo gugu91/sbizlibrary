@@ -316,8 +316,19 @@ namespace Sbiz.Library
                     state_out.key = state.key;
                     state_out.data = new byte[state_out.datasize];
 
-                    handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
-                        new AsyncCallback(ReadCallback), state_out); //TODO handle object disposed exception fails here if auth failed
+                    try
+                    {
+                        handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
+                        new AsyncCallback(ReadCallback), state_out); //TODO handle object disposed exception fails 
+                                                                    //here if auth failed on server
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        if (state.model_changed != null) state.model_changed(this,
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Peer disconnected", this.Identifier));
+                        Connected = false;
+                    }
+                    
                 }
                 else//peershutdown
                 {
@@ -353,10 +364,11 @@ namespace Sbiz.Library
                         SendData(SbizMessage.AuthenticationMessage(state.key, (IPEndPoint)state.socket.LocalEndPoint), state.model_changed);
                     }
                     if(state.model_changed != null) state.model_changed(this,
-                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed"));
+                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed", this.Identifier));
                     Connected = false;
                     if (s_conn != null)
                     {
+                        s_conn.Shutdown(SocketShutdown.Both);
                         s_conn.Close();
                         s_conn = null;
                     }
