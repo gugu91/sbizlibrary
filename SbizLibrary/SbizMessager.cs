@@ -342,7 +342,7 @@ namespace Sbiz.Library
                 new AsyncCallback(ReadCallback), state_out);
         }
 
-        private void HandleReceivedSbizMessage(SbizMessage m, StateObject state)
+        private bool HandleReceivedSbizMessage(SbizMessage m, StateObject state)
         {
             if (!Authenticated)
             {
@@ -351,6 +351,7 @@ namespace Sbiz.Library
                     if(state.model_changed != null) state.model_changed(this,
                         new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.ERROR, "Auth Failed"));
                     CloseConnectionWithClient(state.model_changed);
+                    return false;
                 }
                 else
                 {
@@ -377,6 +378,7 @@ namespace Sbiz.Library
                     _message_handle(m);
                 }
             }
+            return true;
         }
 
         public bool AuthenticateClient (SbizMessage m, string key, IPEndPoint ipe)
