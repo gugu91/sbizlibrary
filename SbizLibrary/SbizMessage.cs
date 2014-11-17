@@ -47,7 +47,9 @@ namespace Sbiz.Library
         public static bool IsClipboardConst(Int32 c)
         {
             if (c == SbizMessageConst.CLIPBOARD_UNICODETEXT || c == SbizMessageConst.CLIPBOARD_IMG||
-                c == SbizMessageConst.CLIPBOARD_FILE || c == SbizMessageConst.CLIPBOARD_AUDIO)
+                c == SbizMessageConst.CLIPBOARD_FILE || c == SbizMessageConst.CLIPBOARD_AUDIO||
+                c == SbizMessageConst.CLIPBOARD_START || c == SbizMessageConst.CLIPBOARD_STOP ||
+                c == SbizMessageConst.CLIPBOARD_TEXT)
             {
                 return true;
             }
