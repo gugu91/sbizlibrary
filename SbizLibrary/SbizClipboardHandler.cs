@@ -133,7 +133,8 @@ namespace Sbiz.Library
         }
         public static void BitmapSend(Bitmap img, SbizModelChanged_Delegate model_changed)
         {
-            byte[] data = SbizNetUtils.SerializeObject(img);
+            ImageConverter converter = new ImageConverter();
+            byte[] data = (byte[])converter.ConvertTo(img, typeof(byte[]));
             SbizMessage m = new SbizMessage(SbizMessageConst.CLIPBOARD_IMG, data);
             if (_message_sender != null) _message_sender(m, model_changed);
 
@@ -204,7 +205,8 @@ namespace Sbiz.Library
             #region IMG
             else if (m.Code == SbizMessageConst.CLIPBOARD_IMG && _data_object_buffer != null)
             {
-                Bitmap img = (Bitmap)SbizNetUtils.DeserializeByteArray(m.Data);
+                var ms = new MemoryStream(m.Data);
+                Image img = Image.FromStream(ms);
                 _data_object_buffer.SetData(DataFormats.Bitmap, img);
 
                 recognized = true;
