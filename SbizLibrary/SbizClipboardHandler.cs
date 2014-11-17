@@ -52,14 +52,20 @@ namespace Sbiz.Library
                     totalsize += fi.Length;
                 }
 
+                SbizFileEntry[] all_entries = new SbizFileEntry[files.Count()];
+
                 if (totalsize < MAX_FILELENGTH) //if it exceeds maximum length do nothing
                 {
+                    int i = 0;
                     foreach (string filePath in files)
                     {
                         SbizFileEntry sfe = new SbizFileEntry(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
-                        var m = new SbizMessage(SbizMessageConst.CLIPBOARD_FILE, sfe.ToByteArray());
-                        if (_message_sender != null) _message_sender(m, model_changed);
+                        all_entries[i] = sfe;
+                        i++;
                     }
+
+                    var m = new SbizMessage(SbizMessageConst.CLIPBOARD_FILE, SbizNetUtils.SerializeObject(all_entries));
+                    if (_message_sender != null) _message_sender(m, model_changed);
                 }
         }
 
@@ -96,15 +102,19 @@ namespace Sbiz.Library
             }
             if (m.Code == SbizMessageConst.CLIPBOARD_FILE)
             {
-                SbizFileEntry sfe = new SbizFileEntry(m.Data);
-                string filepath = SbizConf.SbizTmpFilePath(sfe.file_name);
-                File.WriteAllBytes(filepath, sfe.file_bytes);
-                string[] filedrop = new string[1];
-                filedrop[0] = filepath;
+                SbizFileEntry[] all_entries = (SbizFileEntry[])SbizNetUtils.DeserializeByteArray(m.Data);
+                string[] filedrop = new string[all_entries.Count()];
+                int i = 0;
+                foreach (SbizFileEntry sfe in all_entries)
+                {
+                    string filepath = SbizConf.SbizTmpFilePath(sfe.file_name);
+                    File.WriteAllBytes(filepath, sfe.file_bytes);
+                    filedrop[i] = Path.GetFullPath(filepath);
+                }
                 data.SetData(DataFormats.FileDrop, filedrop);
-
                 recognized = true;
             }
+
             if (recognized)
             {
                 NativeImport.RemoveClipboardFormatListener(view_handle);
