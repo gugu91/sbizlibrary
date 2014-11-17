@@ -308,7 +308,8 @@ namespace Sbiz.Library
                         state_out.datasize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(state.buffer, 0));
                         state_out.seek = 0;
                         state_out.size_message = false;
-                        state_out.buffer = new byte[1024 * 1024];
+                        if (state_out.datasize >= 1024) state_out.buffer = new byte[1024];
+                        else state_out.buffer = new byte[state_out.datasize];
                         state_out.data = new byte[state_out.datasize];
                         SbizBeginReceive(handler, state_out);
                     }
@@ -325,6 +326,8 @@ namespace Sbiz.Library
                         }
                         else //still missing some data
                         {
+                            int bytes_left = state.datasize - state.seek + 1;
+                            if (bytes_left < 1024) state.buffer = new byte[bytes_left];
                             SbizBeginReceive(handler, state);
                         }
                     }
