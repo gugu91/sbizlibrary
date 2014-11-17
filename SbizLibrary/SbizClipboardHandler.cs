@@ -115,6 +115,7 @@ namespace Sbiz.Library
                     string filepath = SbizConf.SbizTmpFilePath(sfe.file_name);
                     File.WriteAllBytes(filepath, sfe.file_bytes);
                     filedrop[i] = Path.GetFullPath(filepath);
+                    i++;
                 }
                 data.SetData(DataFormats.FileDrop, filedrop);
                 recognized = true;
