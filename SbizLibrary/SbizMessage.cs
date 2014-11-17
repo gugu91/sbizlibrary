@@ -34,12 +34,14 @@ namespace Sbiz.Library
         public const Int32 MOUSE_LEAVE = 26;
         #endregion
 
-        #region Clipboard (30-34)
+        #region Clipboard (30-36)
         public const Int32 CLIPBOARD_AUDIO = 30;
         public const Int32 CLIPBOARD_FILE = 31;
-        public const Int32 CLIPBOARD_FILENAME = 34;
         public const Int32 CLIPBOARD_IMG = 32;
         public const Int32 CLIPBOARD_UNICODETEXT = 33;
+        public const Int32 CLIPBOARD_TEXT = 36;
+        public const Int32 CLIPBOARD_START = 34;
+        public const Int32 CLIPBOARD_STOP = 35;
         #endregion
 
         public static bool IsClipboardConst(Int32 c)
