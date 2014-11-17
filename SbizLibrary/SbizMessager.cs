@@ -300,39 +300,35 @@ namespace Sbiz.Library
 
                 if (bytesRead > 0)
                 {
-                    /* NB there was previously a protocol error as size of the data buffer was not sent, causing
-                     * some data to not be processed by server.
-                     */
-                    StateObject state_out = new StateObject(handler, state.model_changed, state.view_handle);
 
-                    if (state.seek == 0) //Received the size of the subsequent message
-                    { 
+                    if (state.size_message) //Received the size of the subsequent message
+                    {
+                        StateObject state_out = new StateObject(handler, state.model_changed, state.view_handle, state.key);
+
                         state_out.datasize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(state.data, 0));
-                        state_out.seek = sizeof(Int32);
-                    }
-                    else if(state.seek == sizeof(Int32)) //received a sbiz message
-                    {
-                        var m = new SbizMessage(state.data);
-                        HandleReceivedSbizMessage(m, state);
-
-                        state_out.datasize = sizeof(Int32);
                         state_out.seek = 0;
+                        state_out.size_message = false;
+                        state_out.buffer = new byte[1024 * 1024];
+                        state_out.data = new byte[state_out.datasize];
+                        SbizBeginReceive(handler, state_out);
+                    }
+                    else //received part of a sbiz message
+                    {
+                        Array.Copy(state.buffer, 0, state.data, state.seek, bytesRead);
+                        state.seek += bytesRead;
+                        if (state.seek >= state.datasize) //received the whole message
+                        {
+                            var m = new SbizMessage(state.data);
+                            HandleReceivedSbizMessage(m, state);
+
+                            BeginReceiveMessageSize(handler, state.model_changed, state.view_handle, state.key);
+                        }
+                        else //still missing some data
+                        {
+                            SbizBeginReceive(handler, state);
+                        }
                     }
 
-                    state_out.key = state.key;
-                    state_out.data = new byte[state_out.datasize];
-
-                    try
-                    {
-                        handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
-                        new AsyncCallback(ReadCallback), state_out);
-                    }
-                    catch (Exception)
-                    {
-                        if (state.model_changed != null) state.model_changed(this,
-                        new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN, "Remote endpoint disconnected", this.Identifier));
-                        Connected = false;
-                    }
                     
                 }
                 else//peershutdown
@@ -345,6 +341,21 @@ namespace Sbiz.Library
             if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle, state.key));
         }
 
+        private void SbizBeginReceive(Socket handler, StateObject state_out)
+        {
+            try
+            {
+                handler.BeginReceive(state_out.buffer, 0, state_out.buffer.Count(), 0,
+                new AsyncCallback(ReadCallback), state_out);
+            }
+            catch (Exception)
+            {
+                if (state_out.model_changed != null) state_out.model_changed(this,
+                new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN, "Remote endpoint disconnected", this.Identifier));
+                Connected = false;
+            }
+        }
+
         private void BeginReceiveMessageSize(Socket handler, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key)
         {
             // Create the state object.
@@ -352,10 +363,10 @@ namespace Sbiz.Library
             state_out.socket = handler;
             state_out.datasize = sizeof(Int32);
             state_out.seek = 0;
-            state_out.data = new byte[state_out.datasize];
+            state_out.size_message = true;
+            state_out.buffer = new byte[sizeof(Int32)];
             handler.ReceiveTimeout = 1000;
-            handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
-                new AsyncCallback(ReadCallback), state_out);
+            SbizBeginReceive(handler, state_out);
         }
 
         private bool HandleReceivedSbizMessage(SbizMessage m, StateObject state)
@@ -487,11 +498,13 @@ namespace Sbiz.Library
             public Socket socket;
             public int datasize;
             public int seek;
+            public bool size_message;
             public IntPtr view_handle;
             public SbizModelChanged_Delegate model_changed;
             public string key;
             // Receive buffer.
             public byte[] data;
+            public byte[] buffer;
 
             public StateObject(Socket socket, SbizModelChanged_Delegate model_changed, IntPtr view_handle, string key = null)
             {
