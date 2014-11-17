@@ -348,6 +348,7 @@ namespace Sbiz.Library
         {
             try
             {
+                handler.ReceiveTimeout = 1000;
                 handler.BeginReceive(state_out.buffer, 0, state_out.buffer.Count(), 0,
                 new AsyncCallback(ReadCallback), state_out);
             }
@@ -368,7 +369,6 @@ namespace Sbiz.Library
             state_out.seek = 0;
             state_out.size_message = true;
             state_out.buffer = new byte[sizeof(Int32)];
-            handler.ReceiveTimeout = 1000;
             SbizBeginReceive(handler, state_out);
         }
 
