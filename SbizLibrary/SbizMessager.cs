@@ -326,7 +326,7 @@ namespace Sbiz.Library
                         }
                         else //still missing some data
                         {
-                            int bytes_left = state.datasize - state.seek + 1;
+                            int bytes_left = state.datasize - state.seek;
                             if (bytes_left < 1024) state.buffer = new byte[bytes_left];
                             SbizBeginReceive(handler, state);
                         }
