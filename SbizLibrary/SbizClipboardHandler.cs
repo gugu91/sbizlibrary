@@ -133,8 +133,10 @@ namespace Sbiz.Library
         }
         public static void BitmapSend(Bitmap img, SbizModelChanged_Delegate model_changed)
         {
-            ImageConverter converter = new ImageConverter();
-            byte[] data = (byte[])converter.ConvertTo(img, typeof(byte[]));
+            MemoryStream stream = new MemoryStream();
+            img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            stream.Close();
+            byte[] data = stream.ToArray();
             SbizMessage m = new SbizMessage(SbizMessageConst.CLIPBOARD_IMG, data);
             if (_message_sender != null) _message_sender(m, model_changed);
 
