@@ -305,7 +305,7 @@ namespace Sbiz.Library
                     {
                         StateObject state_out = new StateObject(handler, state.model_changed, state.view_handle, state.key);
 
-                        state_out.datasize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(state.data, 0));
+                        state_out.datasize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(state.buffer, 0));
                         state_out.seek = 0;
                         state_out.size_message = false;
                         state_out.buffer = new byte[1024 * 1024];
