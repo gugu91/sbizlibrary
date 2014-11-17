@@ -108,6 +108,7 @@ namespace Sbiz.Library
             {
                 SbizFileEntry[] all_entries = (SbizFileEntry[])SbizNetUtils.DeserializeByteArray(m.Data);
                 string[] filedrop = new string[all_entries.Count()];
+                SbizConf.ResetTmpDir();
                 int i = 0;
                 foreach (SbizFileEntry sfe in all_entries)
                 {

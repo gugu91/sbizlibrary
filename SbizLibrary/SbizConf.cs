@@ -244,6 +244,11 @@ namespace Sbiz.Library
         {
             return SbizTmpDirPath + "\\" + filename;
         }
+        public static void ResetTmpDir()
+        {
+            DirectoryInfo downloadedMessageInfo = new DirectoryInfo(SbizTmpDirPath);
+            foreach (FileInfo file in downloadedMessageInfo.GetFiles()) file.Delete();
+        }
     }
     #endregion
 }
