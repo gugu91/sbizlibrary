@@ -42,24 +42,28 @@ namespace Sbiz.Library
         }*/
         }
 
-        public static void FileDropSend(string[] files, SbizModelChanged_Delegate model_changed)
+        /// <summary>
+        /// Directories and files bigger than MAX_FILELENGTH are not supported
+        /// </summary>
+        /// <param name="all_paths"></param>
+        /// <param name="model_changed"></param>
+        public static void FileDropSend(string[] all_paths, SbizModelChanged_Delegate model_changed)
         {
              long totalsize=0;
 
-                foreach (string filePath in files)
+                foreach (string path in all_paths)
                 {
-                    FileInfo fi = new FileInfo(filePath);
-                    totalsize += fi.Length;
+                    totalsize += FileSystemSize(path);
                 }
 
-                SbizFileEntry[] all_entries = new SbizFileEntry[files.Count()];
+                SbizFileEntry[] all_entries = new SbizFileEntry[all_paths.Count()];
 
                 if (totalsize < MAX_FILELENGTH) //if it exceeds maximum length do nothing
                 {
                     int i = 0;
-                    foreach (string filePath in files)
+                    foreach (string path in all_paths)
                     {
-                        SbizFileEntry sfe = new SbizFileEntry(Path.GetFileName(filePath), File.ReadAllBytes(filePath));
+                        SbizFileEntry sfe = new SbizFileEntry(Path.GetFileName(path), File.ReadAllBytes(path));
                         all_entries[i] = sfe;
                         i++;
                     }
@@ -129,6 +133,42 @@ namespace Sbiz.Library
 
             return recognized;
         }
+
+        #region File Utils
+        public static long FileSystemSize(String path)
+        {
+            // get the file attributes for file or directory
+            FileAttributes attr = File.GetAttributes(path);
+
+            //detect whether its a directory or file
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+            {
+                return MAX_FILELENGTH*2;
+            }
+            else
+            {
+                FileInfo fi = new FileInfo(path);
+                return fi.Length;
+            }
+        }
+        public static long DirectorySize(DirectoryInfo d)
+        {
+            long Size = 0;
+            // Add file sizes.
+            FileInfo[] fis = d.GetFiles();
+            foreach (FileInfo fi in fis)
+            {
+                Size += fi.Length;
+            }
+            // Add subdirectory sizes.
+            DirectoryInfo[] dis = d.GetDirectories();
+            foreach (DirectoryInfo di in dis)
+            {
+                Size += DirectorySize(di);
+            }
+            return (Size);
+        }
+        #endregion
     }
 
     [Serializable]
