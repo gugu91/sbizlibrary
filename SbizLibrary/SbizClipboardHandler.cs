@@ -121,6 +121,7 @@ namespace Sbiz.Library
         }
     }
 
+    [Serializable]
     class SbizFileEntry
     {
         public string file_name;
