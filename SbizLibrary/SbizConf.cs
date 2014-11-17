@@ -221,5 +221,29 @@ namespace Sbiz.Library
 
         #endregion
         #endregion
+
+        #region SbizTmpDir
+
+        #region Attributes
+        private const string _sbiztmpdirPath = "tmp";
+        #endregion
+
+        private static string SbizTmpDirPath
+        {
+            get
+            {
+                if (!Directory.Exists(_sbiztmpdirPath))
+                {
+                    Directory.CreateDirectory(_sbiztmpdirPath);
+                    AddDirectorySecurity(_sbiztmpdirPath, Environment.UserName, FileSystemRights.FullControl, AccessControlType.Allow);
+                }
+                return _sbiztmpdirPath;
+            }
+        }
+        public static string SbizTmpFilePath(string filename)
+        {
+            return SbizTmpDirPath + "\\" + filename;
+        }
     }
+    #endregion
 }

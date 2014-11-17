@@ -123,6 +123,7 @@ namespace Sbiz.Library
         {
             s_listen = null;
             s_conn = null;
+            Authenticated = false;
             Connected = false;
             Listening = false;
         }
@@ -132,6 +133,7 @@ namespace Sbiz.Library
             _tcp_port = tcp_port;
             s_listen = null;
             s_conn = null;
+            Authenticated = false;
             Connected = false;
             Listening = false;
         }
@@ -403,9 +405,13 @@ namespace Sbiz.Library
             if (m.Code == SbizMessageConst.AUTHENTICATE)
 
                 if (System.Linq.Enumerable.SequenceEqual(m.Data, valid))
+                {
                     Authenticated = true;
+                    return true;
+                }
 
-            return Authenticated;
+
+            return  false;
         }
         #endregion
 
