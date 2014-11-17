@@ -17,7 +17,6 @@ namespace Sbiz.Library
         private IPAddress _ip_add;
         private int _tcp_port;
         private IntPtr _view_handle;
-        private SbizMessageHandle_Delegate _message_handle;
         #endregion
 
         #region Thread Safe Properties
@@ -100,6 +99,7 @@ namespace Sbiz.Library
         }
         #endregion
 
+        #region Properties
         public string Identifier
         {
             get
@@ -108,7 +108,10 @@ namespace Sbiz.Library
                 return _ip_add.ToString() + ":" + _tcp_port.ToString();
             }
         }
+        #endregion
 
+        #region Message Handle Delegate
+        private SbizMessageHandle_Delegate _message_handle;
         public void RegisterMessageHandle(SbizMessageHandle_Delegate del)
         {
             _message_handle += del;
@@ -117,6 +120,7 @@ namespace Sbiz.Library
         {
             _message_handle -= del;
         }
+        #endregion
 
         #region Constructors
         public SbizMessager() // SERVER call this construstor to istanciate a server
@@ -172,6 +176,7 @@ namespace Sbiz.Library
         } // CLIENT shuts down connection with the server
         #endregion
 
+        #region Senders
         public void SendData(byte[] data, SbizModelChanged_Delegate model_changed)
         {
             try
@@ -194,11 +199,11 @@ namespace Sbiz.Library
                 }
             }
         }
-
         public void SendMessage(SbizMessage m, SbizModelChanged_Delegate model_changed)
         {
             SendData(m.ToByteArray(), model_changed);
         }
+        #endregion
 
         #region Async Callbacks
         private void SendCallback(IAsyncResult ar)
@@ -320,8 +325,7 @@ namespace Sbiz.Library
                     try
                     {
                         handler.BeginReceive(state_out.data, 0, state_out.datasize, 0,
-                        new AsyncCallback(ReadCallback), state_out); //TODO handle object disposed exception fails 
-                                                                    //here if auth failed on server
+                        new AsyncCallback(ReadCallback), state_out);
                     }
                     catch (Exception)
                     {
@@ -430,7 +434,7 @@ namespace Sbiz.Library
                 s_listen.Bind(ipe);
                 s_listen.Listen(100);
             }
-            catch (Exception e)//TODO handle bind exception
+            catch (Exception e)//TODO handle bind exception (alert the user)
             {
                 throw e;
             }
@@ -457,8 +461,15 @@ namespace Sbiz.Library
 
             if (s_conn != null)
             {
-                s_conn.Shutdown(SocketShutdown.Both);//SOCKET EXCEPTION HERE IF THE OTHER IS DEAD
-                s_conn.Close();
+                try
+                {
+                    s_conn.Shutdown(SocketShutdown.Both);
+                    s_conn.Close();
+                }
+                catch (Exception)
+                {
+                    //Already closed by peer do nothing
+                }
                 s_conn = null;
             }
             if (s_listen != null)
@@ -470,6 +481,7 @@ namespace Sbiz.Library
 
         #endregion
 
+        #region Internal Class State Object
         private class StateObject
         {
             public Socket socket;
@@ -489,5 +501,6 @@ namespace Sbiz.Library
                 this.key = key;
             }
         }
+        #endregion
     }
 }
