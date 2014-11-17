@@ -457,7 +457,7 @@ namespace Sbiz.Library
 
             if (s_conn != null)
             {
-                s_conn.Shutdown(SocketShutdown.Both);
+                s_conn.Shutdown(SocketShutdown.Both);//SOCKET EXCEPTION HERE IF THE OTHER IS DEAD
                 s_conn.Close();
                 s_conn = null;
             }
