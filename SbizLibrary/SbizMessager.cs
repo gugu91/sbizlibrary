@@ -300,7 +300,6 @@ namespace Sbiz.Library
 
                 if (bytesRead > 0)
                 {
-
                     if (state.size_message) //Received the size of the subsequent message
                     {
                         StateObject state_out = new StateObject(handler, state.model_changed, state.view_handle, state.key);
@@ -322,6 +321,13 @@ namespace Sbiz.Library
                             var m = new SbizMessage(state.data);
                             if(HandleReceivedSbizMessage(m, state))
                                 BeginReceiveMessageSize(handler, state.model_changed, state.view_handle, state.key);
+                            else //auth failed, accept new conection
+                            {
+                                if (Listening)
+                                    s_listen.BeginAccept(AcceptCallback, 
+                                        new StateObject(s_listen, state.model_changed, state.view_handle, state.key));
+                                return;
+                            }
                         }
                         else //still missing some data
                         {
@@ -329,18 +335,19 @@ namespace Sbiz.Library
                             if (bytes_left < 1024) state.buffer = new byte[bytes_left];
                             SbizBeginReceive(handler, state);
                         }
-                    }
-
-                    
+                    }            
                 }
                 else//peershutdown
                 {
                     if (state.model_changed != null) state.model_changed(this, 
                         new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.PEER_SHUTDOWN,"Remote endpoint disconnected", this.Identifier));
                     Connected = false;
+                    if (Listening)
+                        s_listen.BeginAccept(AcceptCallback, 
+                            new StateObject(s_listen, state.model_changed, state.view_handle, state.key));
                 }
             }
-            if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle, state.key));
+            //if (Listening && !Connected) s_listen.BeginAccept(AcceptCallback, new StateObject(s_listen, state.model_changed, state.view_handle, state.key));
         }
 
         private void SbizBeginReceive(Socket handler, StateObject state_out)
