@@ -320,9 +320,8 @@ namespace Sbiz.Library
                         if (state.seek >= state.datasize) //received the whole message
                         {
                             var m = new SbizMessage(state.data);
-                            HandleReceivedSbizMessage(m, state);
-
-                            BeginReceiveMessageSize(handler, state.model_changed, state.view_handle, state.key);
+                            if(HandleReceivedSbizMessage(m, state))
+                                BeginReceiveMessageSize(handler, state.model_changed, state.view_handle, state.key);
                         }
                         else //still missing some data
                         {
@@ -384,13 +383,13 @@ namespace Sbiz.Library
                     }
                     if(state.model_changed != null) state.model_changed(this,
                         new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.AUTH_FAILED, "Authentication failed, probably incorrect password", this.Identifier));
-                    Connected = false;
-                    if (s_conn != null)
+                    
+                    if (Connected)
                     {
-                        s_conn.Shutdown(SocketShutdown.Both);
                         s_conn.Close();
-                        s_conn = null;
+                        Connected = false;
                     }
+                    return false;
                 }
                 else
                 {
@@ -470,25 +469,22 @@ namespace Sbiz.Library
         /// </summary>
         public void StopServer(SbizModelChanged_Delegate model_changed)
         {
-            Listening = false;
-            Connected = false;
-
-            if (s_conn != null)
+            if (Connected)
             {
                 try
                 {
-                    s_conn.Shutdown(SocketShutdown.Both);
                     s_conn.Close();
                 }
                 catch (Exception)
                 {
                     //Already closed by peer do nothing
                 }
-                s_conn = null;
+                Connected = false;
             }
-            if (s_listen != null)
+            if (Listening)
             {
                 s_listen.Close();
+                Listening = false;
             }
             model_changed(this, new SbizModelChanged_EventArgs(SbizModelChanged_EventArgs.NOT_LISTENING));
         }
